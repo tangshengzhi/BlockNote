@@ -3,7 +3,7 @@
   "homepage": "https://github.com/TypeCellOS/BlockNote",
   "private": false,
   "license": "MPL-2.0",
-  "version": "0.8.4-alpha.0",
+  "version": "0.8.5-alpha.0",
   "files": [
     "dist",
     "types",
@@ -106,9 +106,5 @@
       "curly": 1
     }
   },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "gitHead": "37614ab348dcc7faa830a9a88437b37197a2162d"
+  "gitHead": "1fa372c89a301f2b12f0e60a524ea7e89e1b6c98"
 }

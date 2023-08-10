@@ -536,8 +536,8 @@ export class BlockNoteEditor<BSchema extends BlockSchema = DefaultBlockSchema,TE
     blocksToInsert: PartialBlock<BSchema>[],
     referenceBlock: BlockIdentifier,
     placement: "before" | "after" | "nested" = "before"
-  ): void {
-    insertBlocks(blocksToInsert, referenceBlock, placement, this._tiptapEditor);
+  ) {
+    return insertBlocks(blocksToInsert, referenceBlock, placement, this._tiptapEditor);
   }
 
   /**

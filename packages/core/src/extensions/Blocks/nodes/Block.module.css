@@ -43,11 +43,11 @@ NESTED BLOCKS
   margin-left: 1.5em;
 }
 
-.blockGroup .blockGroup > .blockOuter {
+.blockGroup .blockGroup>.blockOuter {
   position: relative;
 }
 
-.blockGroup .blockGroup > .blockOuter:not([data-prev-depth-changed])::before {
+.blockGroup .blockGroup>.blockOuter:not([data-prev-depth-changed])::before {
   content: " ";
   display: inline;
   position: absolute;
@@ -56,21 +56,15 @@ NESTED BLOCKS
   transition: all 0.2s 0.1s;
 }
 
-[data-theme="light"]
-  .blockGroup
-  .blockGroup
-  > .blockOuter:not([data-prev-depth-changed])::before {
+[data-theme="light"] .blockGroup .blockGroup>.blockOuter:not([data-prev-depth-changed])::before {
   border-left: 1px solid #AFAFAF;
 }
 
-[data-theme="dark"]
-  .blockGroup
-  .blockGroup
-  > .blockOuter:not([data-prev-depth-changed])::before {
+[data-theme="dark"] .blockGroup .blockGroup>.blockOuter:not([data-prev-depth-changed])::before {
   border-left: 1px solid #7F7F7F;
 }
 
-.blockGroup .blockGroup > .blockOuter[data-prev-depth-change="-2"]::before {
+.blockGroup .blockGroup>.blockOuter[data-prev-depth-change="-2"]::before {
   height: 0;
 }
 
@@ -79,15 +73,19 @@ NESTED BLOCKS
 [data-prev-depth-change="1"] {
   --x: 1;
 }
+
 [data-prev-depth-change="2"] {
   --x: 2;
 }
+
 [data-prev-depth-change="3"] {
   --x: 3;
 }
+
 [data-prev-depth-change="4"] {
   --x: 4;
 }
+
 [data-prev-depth-change="5"] {
   --x: 5;
 }
@@ -95,15 +93,19 @@ NESTED BLOCKS
 [data-prev-depth-change="-1"] {
   --x: -1;
 }
+
 [data-prev-depth-change="-2"] {
   --x: -2;
 }
+
 [data-prev-depth-change="-3"] {
   --x: -3;
 }
+
 [data-prev-depth-change="-4"] {
   --x: -4;
 }
+
 [data-prev-depth-change="-5"] {
   --x: -5;
 }
@@ -120,9 +122,11 @@ NESTED BLOCKS
 [data-level="1"] {
   --level: 3em;
 }
+
 [data-level="2"] {
   --level: 2em;
 }
+
 [data-level="3"] {
   --level: 1.3em;
 }
@@ -130,21 +134,21 @@ NESTED BLOCKS
 [data-prev-level="1"] {
   --prev-level: 3em;
 }
+
 [data-prev-level="2"] {
   --prev-level: 2em;
 }
+
 [data-prev-level="3"] {
   --prev-level: 1.3em;
 }
 
-.blockOuter[data-prev-type="heading"] > .block > .blockContent {
+.blockOuter[data-prev-type="heading"]>.block>.blockContent {
   font-size: var(--prev-level);
   font-weight: bold;
 }
 
-.blockOuter:not([data-prev-type])
-  > .block
-  > .blockContent[data-content-type="heading"] {
+.blockOuter:not([data-prev-type])>.block>.blockContent[data-content-type="heading"] {
   font-size: var(--level);
   font-weight: bold;
 }
@@ -165,72 +169,46 @@ NESTED BLOCKS
   --prev-index: attr(data-prev-index);
 }
 
-.blockOuter[data-prev-type="numberedListItem"]:not([data-prev-index="none"])
-  > .block
-  > .blockContent::before {
+.blockOuter[data-prev-type="numberedListItem"]:not([data-prev-index="none"])>.block>.blockContent::before {
   margin-right: 1.2em;
   content: var(--prev-index) ".";
 }
 
-.blockOuter:not([data-prev-type])
-  > .block
-  > .blockContent[data-content-type="numberedListItem"]::before {
+.blockOuter:not([data-prev-type])>.block>.blockContent[data-content-type="numberedListItem"]::before {
   margin-right: 1.2em;
   content: var(--index) ".";
 }
 
 /* Unordered */
 /* No list nesting */
-.blockOuter[data-prev-type="bulletListItem"] > .block > .blockContent::before {
+.blockOuter[data-prev-type="bulletListItem"]>.block>.blockContent::before {
   margin-right: 1.2em;
   content: "•";
 }
 
-.blockOuter:not([data-prev-type])
-  > .block
-  > .blockContent[data-content-type="bulletListItem"]::before {
+.blockOuter:not([data-prev-type])>.block>.blockContent[data-content-type="bulletListItem"]::before {
   margin-right: 1.2em;
   content: "•";
 }
 
 /* 1 level of list nesting */
-[data-content-type="bulletListItem"]
-  ~ .blockGroup
-  > .blockOuter[data-prev-type="bulletListItem"]
-  > .block
-  > .blockContent::before {
+[data-content-type="bulletListItem"]~.blockGroup>.blockOuter[data-prev-type="bulletListItem"]>.block>.blockContent::before {
   margin-right: 1.2em;
   content: "◦";
 }
 
-[data-content-type="bulletListItem"]
-  ~ .blockGroup
-  > .blockOuter:not([data-prev-type])
-  > .block
-  > .blockContent[data-content-type="bulletListItem"]::before {
+[data-content-type="bulletListItem"]~.blockGroup>.blockOuter:not([data-prev-type])>.block>.blockContent[data-content-type="bulletListItem"]::before {
   margin-right: 1.2em;
   content: "◦";
 }
 
 /* 2 levels of list nesting */
-[data-content-type="bulletListItem"]
-  ~ .blockGroup
-  [data-content-type="bulletListItem"]
-  ~ .blockGroup
-  > .blockOuter[data-prev-type="bulletListItem"]
-  > .block
-  > .blockContent::before {
+[data-content-type="bulletListItem"]~.blockGroup [data-content-type="bulletListItem"]~.blockGroup>.blockOuter[data-prev-type="bulletListItem"]>.block>.blockContent::before {
   margin-right: 1.2em;
   content: "▪";
 }
 
-[data-content-type="bulletListItem"]
-  ~ .blockGroup
-  [data-content-type="bulletListItem"]
-  ~ .blockGroup
-  > .blockOuter:not([data-prev-type])
-  > .block
-  > .blockContent[data-content-type="bulletListItem"]::before {
+[data-content-type="bulletListItem"]~.blockGroup [data-content-type="bulletListItem"]~.blockGroup>.blockOuter:not([data-prev-type])>.block>.blockContent[data-content-type="bulletListItem"]::before {
   margin-right: 1.2em;
   content: "▪";
 }
@@ -261,7 +239,7 @@ NESTED BLOCKS
 /* TODO: would be nicer if defined from code */
 
 .isEmpty.hasAnchor .inlineContent:before {
-  content: "Enter text or type '/' for commands";
+  content: var(--editor-placeholder, "Enter text or type '/' for commands");
 }
 
 .blockContent.isFilter.hasAnchor .inlineContent:before {
@@ -273,8 +251,7 @@ NESTED BLOCKS
 }
 
 .blockContent[data-content-type="bulletListItem"].isEmpty .inlineContent:before,
-.blockContent[data-content-type="numberedListItem"].isEmpty
-.inlineContent:before {
+.blockContent[data-content-type="numberedListItem"].isEmpty .inlineContent:before {
   content: "List";
 }
 
