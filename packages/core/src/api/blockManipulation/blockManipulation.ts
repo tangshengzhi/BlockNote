@@ -125,6 +125,7 @@ export function replaceBlocks<BSchema extends BlockSchema>(
   blocksToInsert: PartialBlock<BSchema>[],
   editor: Editor
 ) {
-  insertBlocks(blocksToInsert, blocksToRemove[0], "before", editor);
+  const blocks = insertBlocks(blocksToInsert, blocksToRemove[0], "before", editor);
   removeBlocks(blocksToRemove, editor);
+  return blocks;
 }
