@@ -504,6 +504,7 @@ export const BlockContainer = Node.create<IBlock>({
               chain()
                 .BNCreateBlock(newBlockInsertionPos)
                 .setTextSelection(newBlockContentPos)
+                .scrollIntoView()
                 .run();
 
               return true;
