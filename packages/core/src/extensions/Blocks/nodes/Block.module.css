@@ -120,27 +120,27 @@ NESTED BLOCKS
 
 /* HEADINGS*/
 [data-level="1"] {
-  --level: 3em;
+  --level: 26px;
 }
 
 [data-level="2"] {
-  --level: 2em;
+  --level: 22px;
 }
 
 [data-level="3"] {
-  --level: 1.3em;
+  --level: 20px;
 }
 
 [data-prev-level="1"] {
-  --prev-level: 3em;
+  --prev-level: 26px;
 }
 
 [data-prev-level="2"] {
-  --prev-level: 2em;
+  --prev-level: 22px;
 }
 
 [data-prev-level="3"] {
-  --prev-level: 1.3em;
+  --prev-level: 1.20px;
 }
 
 .blockOuter[data-prev-type="heading"]>.block>.blockContent {
