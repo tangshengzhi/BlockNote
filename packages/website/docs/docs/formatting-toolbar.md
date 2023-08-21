@@ -27,6 +27,7 @@ You can see how this is done in the example below, which has a custom Formatting
 ::: sandbox {template=react-ts}
 
 ```typescript-vue /App.tsx
+import { useState } from "react";
 import { BlockNoteEditor } from "@blocknote/core";
 import {
   BlockNoteView,
@@ -42,7 +43,6 @@ import {
   useEditorSelectionChange,
 } from "@blocknote/react";
 import "@blocknote/core/style.css";
-import { useState } from "react";
 
 const CustomFormattingToolbar = (props: { editor: BlockNoteEditor }) => {
   // Tracks whether the text & background are both blue.
@@ -93,13 +93,11 @@ const CustomFormattingToolbar = (props: { editor: BlockNoteEditor }) => {
 
 export default function App() {
   // Creates a new editor instance.
-  const editor: BlockNoteEditor = useBlockNote({
-    theme: "{{ getTheme(isDark) }}",
-  });
+  const editor: BlockNoteEditor = useBlockNote();
 
   // Renders the editor instance.
   return (
-    <BlockNoteView editor={editor}>
+    <BlockNoteView editor={editor} theme={"{{ getTheme(isDark) }}"}>
       <FormattingToolbarPositioner
         editor={editor}
         formattingToolbar={CustomFormattingToolbar}

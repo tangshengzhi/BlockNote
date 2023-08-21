@@ -86,10 +86,9 @@ export default function App() {
   const [blocks, setBlocks] = useState<Block[] | null>(null);
   
   // Creates a new editor instance.
-  const editor: BlockNoteEditor | null = useBlockNote({
-    theme: "{{ getTheme(isDark) }}",
+  const editor: BlockNoteEditor = useBlockNote({
     // Listens for when the editor's contents change.
-    onEditorContentChange: (editor: BlockNoteEditor) => 
+    onEditorContentChange: (editor) => 
       // Converts the editor's contents to an array of Block objects.
       setBlocks(editor.topLevelBlocks)
   })
@@ -98,7 +97,7 @@ export default function App() {
   // objects, below.
   return (
     <div>
-      <BlockNoteView editor={editor}/>
+      <BlockNoteView editor={editor} theme={"{{ getTheme(isDark) }}"} />
       <pre>{JSON.stringify(blocks, null, 2)}</pre>
     </div>
   );
