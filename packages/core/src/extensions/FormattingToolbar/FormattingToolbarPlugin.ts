@@ -6,6 +6,7 @@ import {
   BaseUiElementState,
   BlockNoteEditor,
   BlockSchema,
+  findScrollContainer,
 } from "../..";
 import { EventEmitter } from "../../shared/EventEmitter";
 
@@ -63,7 +64,10 @@ export class FormattingToolbarView<BSchema extends BlockSchema> {
     pmView.dom.addEventListener("focus", this.focusHandler);
     pmView.dom.addEventListener("blur", this.blurHandler);
 
-    document.addEventListener("scroll", this.scrollHandler);
+    findScrollContainer(pmView.dom).addEventListener(
+      "scroll",
+      this.scrollHandler
+    );
   }
 
   viewMousedownHandler = () => {

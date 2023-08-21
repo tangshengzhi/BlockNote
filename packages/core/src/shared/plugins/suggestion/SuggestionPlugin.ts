@@ -5,6 +5,7 @@ import { BlockSchema } from "../../../extensions/Blocks/api/blockTypes";
 import { findBlock } from "../../../extensions/Blocks/helpers/findBlock";
 import { BaseUiElementState } from "../../BaseUiElementTypes";
 import { SuggestionItem } from "./SuggestionItem";
+import { findScrollContainer } from "../../..";
 
 export type SuggestionsMenuState<T extends SuggestionItem> =
   BaseUiElementState & {
@@ -42,7 +43,10 @@ class SuggestionsMenuView<
       updateSuggestionsMenu(this.suggestionsMenuState);
     };
 
-    document.addEventListener("scroll", this.handleScroll);
+    findScrollContainer(editor.domElement).addEventListener(
+      "scroll",
+      this.handleScroll
+    );
   }
 
   handleScroll = () => {

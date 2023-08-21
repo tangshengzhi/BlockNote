@@ -11,6 +11,7 @@ import { Block, BlockSchema } from "../Blocks/api/blockTypes";
 import { getBlockInfoFromPos } from "../Blocks/helpers/getBlockInfoFromPos";
 import { slashMenuPluginKey } from "../SlashMenu/SlashMenuPlugin";
 import { MultipleNodeSelection } from "./MultipleNodeSelection";
+import { findScrollContainer } from "../..";
 
 const serializeForClipboard = (pv as any).__serializeForClipboard;
 // code based on https://github.com/ueberdosis/tiptap/issues/323#issuecomment-506637799
@@ -263,7 +264,7 @@ export class SideMenuView<BSchema extends BlockSchema> implements PluginView {
     document.body.addEventListener("mousemove", this.onMouseMove, true);
 
     // Makes menu scroll with the page.
-    document.addEventListener("scroll", this.onScroll);
+    findScrollContainer(pmView.dom).addEventListener("scroll", this.onScroll);
 
     // Hides and unfreezes the menu whenever the user presses a key.
     document.body.addEventListener("keydown", this.onKeyDown, true);

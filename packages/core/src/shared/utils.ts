@@ -20,3 +20,19 @@ export class UnreachableCaseError extends Error {
     super(`Unreachable case: ${val}`);
   }
 }
+
+export function findScrollContainer(
+  element: HTMLElement
+): HTMLElement | Document {
+  let parent: HTMLElement | null = element.parentElement;
+  while (parent) {
+    const { overflow } = window.getComputedStyle(parent);
+    if (overflow.split(" ").every((o) => o === "auto" || o === "scroll")) {
+      return parent;
+    }
+
+    parent = parent.parentElement;
+  }
+
+  return document;
+}

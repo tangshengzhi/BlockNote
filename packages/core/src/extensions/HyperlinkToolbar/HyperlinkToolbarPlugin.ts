@@ -6,6 +6,7 @@ import { BlockNoteEditor } from "../../BlockNoteEditor";
 import { BaseUiElementState } from "../../shared/BaseUiElementTypes";
 import { EventEmitter } from "../../shared/EventEmitter";
 import { BlockSchema } from "../Blocks/api/blockTypes";
+import { findScrollContainer } from "../..";
 
 export type HyperlinkToolbarState = BaseUiElementState & {
   // The hovered hyperlink's URL, and the text it's displayed with in the
@@ -63,7 +64,10 @@ class HyperlinkToolbarView<BSchema extends BlockSchema> {
 
     this.pmView.dom.addEventListener("mouseover", this.mouseOverHandler);
     document.addEventListener("click", this.clickHandler, true);
-    document.addEventListener("scroll", this.scrollHandler);
+    findScrollContainer(pmView.dom).addEventListener(
+      "scroll",
+      this.scrollHandler
+    );
   }
 
   mouseOverHandler = (event: MouseEvent) => {
