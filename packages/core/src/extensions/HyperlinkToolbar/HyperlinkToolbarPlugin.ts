@@ -64,10 +64,12 @@ class HyperlinkToolbarView<BSchema extends BlockSchema> {
 
     this.pmView.dom.addEventListener("mouseover", this.mouseOverHandler);
     document.addEventListener("click", this.clickHandler, true);
-    findScrollContainer(pmView.dom).addEventListener(
-      "scroll",
-      this.scrollHandler
-    );
+    setTimeout(() => {
+      findScrollContainer(pmView.dom).addEventListener(
+        "scroll",
+        this.scrollHandler
+      );
+    });
   }
 
   mouseOverHandler = (event: MouseEvent) => {

@@ -262,13 +262,20 @@ export class SideMenuView<BSchema extends BlockSchema> implements PluginView {
 
     // Shows or updates menu position whenever the cursor moves, if the menu isn't frozen.
     document.body.addEventListener("mousemove", this.onMouseMove, true);
+    document.body.addEventListener("mousedown", this.onMouseDown, true);
 
     // Makes menu scroll with the page.
-    findScrollContainer(pmView.dom).addEventListener("scroll", this.onScroll);
+    setTimeout(() => {
+      findScrollContainer(pmView.dom).addEventListener("scroll", this.onScroll);
+    });
 
     // Hides and unfreezes the menu whenever the user presses a key.
     document.body.addEventListener("keydown", this.onKeyDown, true);
   }
+
+  onMouseDown = () => {
+    this.menuFrozen = false;
+  };
 
   /**
    * Sets isDragging when dragging text.
@@ -369,7 +376,7 @@ export class SideMenuView<BSchema extends BlockSchema> implements PluginView {
       event.clientY >= editorOuterBoundingBox.top &&
       event.clientY <= editorOuterBoundingBox.bottom;
 
-    const editorWrapper = this.pmView.dom.parentElement!;
+    const editorWrapper = this.pmView.dom.parentElement?.parentElement;
 
     // Doesn't update if the mouse hovers an element that's over the editor but
     // isn't a part of it or the side menu.
@@ -381,8 +388,9 @@ export class SideMenuView<BSchema extends BlockSchema> implements PluginView {
       event.target &&
       // Element is outside the editor
       !(
-        editorWrapper === event.target ||
-        editorWrapper.contains(event.target as HTMLElement)
+        editorWrapper &&
+        (editorWrapper === event.target ||
+          editorWrapper.contains(event.target as HTMLElement))
       )
     ) {
       if (this.sideMenuState?.show) {
@@ -476,6 +484,7 @@ export class SideMenuView<BSchema extends BlockSchema> implements PluginView {
       this.updateSideMenu(this.sideMenuState);
     }
     document.body.removeEventListener("mousemove", this.onMouseMove);
+    document.body.removeEventListener("mousedown", this.onMouseDown);
     document.body.removeEventListener("dragover", this.onDragOver);
     this.pmView.dom.removeEventListener("dragstart", this.onDragStart);
     document.body.removeEventListener("drop", this.onDrop, true);

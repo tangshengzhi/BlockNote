@@ -43,10 +43,12 @@ class SuggestionsMenuView<
       updateSuggestionsMenu(this.suggestionsMenuState);
     };
 
-    findScrollContainer(editor.domElement).addEventListener(
-      "scroll",
-      this.handleScroll
-    );
+    setTimeout(() => {
+      findScrollContainer(editor.domElement).addEventListener(
+        "scroll",
+        this.handleScroll
+      );
+    });
   }
 
   handleScroll = () => {

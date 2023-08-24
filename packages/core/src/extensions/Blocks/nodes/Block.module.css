@@ -240,19 +240,20 @@ NESTED BLOCKS
 
 .isEmpty.hasAnchor .inlineContent:before {
   content: var(--editor-placeholder, "Enter text or type '/' for commands");
+  color: #cfcfcf;
 }
 
 .blockContent.isFilter.hasAnchor .inlineContent:before {
-  content: "Type to filter";
+  content: var(--editor-type-to-filter, "Type to filter");
 }
 
 .blockContent[data-content-type="heading"].isEmpty .inlineContent:before {
-  content: "Heading";
+  content: var(--editor-heading, "Heading");
 }
 
 .blockContent[data-content-type="bulletListItem"].isEmpty .inlineContent:before,
 .blockContent[data-content-type="numberedListItem"].isEmpty .inlineContent:before {
-  content: "List";
+  content: var(--editor-list, "List");
 }
 
 /* TEXT COLORS */

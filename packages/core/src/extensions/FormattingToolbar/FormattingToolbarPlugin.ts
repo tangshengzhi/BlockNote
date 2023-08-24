@@ -64,10 +64,12 @@ export class FormattingToolbarView<BSchema extends BlockSchema> {
     pmView.dom.addEventListener("focus", this.focusHandler);
     pmView.dom.addEventListener("blur", this.blurHandler);
 
-    findScrollContainer(pmView.dom).addEventListener(
-      "scroll",
-      this.scrollHandler
-    );
+    setTimeout(() => {
+      findScrollContainer(pmView.dom).addEventListener(
+        "scroll",
+        this.scrollHandler
+      );
+    });
   }
 
   viewMousedownHandler = () => {
