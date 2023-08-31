@@ -245,15 +245,18 @@ NESTED BLOCKS
 
 .blockContent.isFilter.hasAnchor .inlineContent:before {
   content: var(--editor-type-to-filter, "Type to filter");
+  color: #cfcfcf;
 }
 
 .blockContent[data-content-type="heading"].isEmpty .inlineContent:before {
   content: var(--editor-heading, "Heading");
+  color: #cfcfcf;
 }
 
 .blockContent[data-content-type="bulletListItem"].isEmpty .inlineContent:before,
 .blockContent[data-content-type="numberedListItem"].isEmpty .inlineContent:before {
   content: var(--editor-list, "List");
+  color: #cfcfcf;
 }
 
 /* TEXT COLORS */

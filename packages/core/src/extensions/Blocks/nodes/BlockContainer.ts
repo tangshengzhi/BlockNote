@@ -487,7 +487,7 @@ export const BlockContainer = Node.create<{
         // empty & at the start of the block.
         () =>
           commands.command(({ state, chain }) => {
-            const { node, endPos } = getBlockInfoFromPos(
+            const { node, endPos, startPos } = getBlockInfoFromPos(
               state.doc,
               state.selection.from
             )!;
@@ -498,17 +498,30 @@ export const BlockContainer = Node.create<{
               state.selection.anchor === state.selection.head;
             const blockEmpty = node.textContent.length === 0;
 
-            if (selectionAtBlockStart && selectionEmpty && blockEmpty) {
-              const newBlockInsertionPos = endPos + 1;
-              const newBlockContentPos = newBlockInsertionPos + 2;
+            if (selectionAtBlockStart && selectionEmpty) {
+              if (blockEmpty) {
+                const newBlockInsertionPos = endPos + 1;
+                const newBlockContentPos = newBlockInsertionPos + 2;
 
-              chain()
-                .BNCreateBlock(newBlockInsertionPos)
-                .setTextSelection(newBlockContentPos)
-                .scrollIntoView()
-                .run();
+                chain()
+                  .BNCreateBlock(newBlockInsertionPos)
+                  .setTextSelection(newBlockContentPos)
+                  .scrollIntoView()
+                  .run();
 
-              return true;
+                return true;
+              } else {
+                const newBlockInsertionPos = startPos - 1;
+                const newBlockContentPos = newBlockInsertionPos + 2;
+
+                chain()
+                  .BNCreateBlock(newBlockInsertionPos)
+                  .setTextSelection(newBlockContentPos)
+                  .scrollIntoView()
+                  .run();
+
+                return true;
+              }
             }
 
             return false;
