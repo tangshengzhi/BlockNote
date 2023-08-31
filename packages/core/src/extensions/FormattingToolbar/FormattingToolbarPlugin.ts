@@ -22,6 +22,8 @@ export class FormattingToolbarView<BSchema extends BlockSchema> {
   public preventShow = false;
   public prevWasEditable: boolean | null = null;
 
+  private scrollableContainer: HTMLElement | Document | null = null;
+
   public shouldShow: (props: {
     view: EditorView;
     state: EditorState;
@@ -65,10 +67,8 @@ export class FormattingToolbarView<BSchema extends BlockSchema> {
     pmView.dom.addEventListener("blur", this.blurHandler);
 
     setTimeout(() => {
-      findScrollContainer(pmView.dom).addEventListener(
-        "scroll",
-        this.scrollHandler
-      );
+      this.scrollableContainer = findScrollContainer(pmView.dom);
+      this.scrollableContainer.addEventListener("scroll", this.scrollHandler);
     });
   }
 
@@ -194,7 +194,7 @@ export class FormattingToolbarView<BSchema extends BlockSchema> {
     this.pmView.dom.removeEventListener("focus", this.focusHandler);
     this.pmView.dom.removeEventListener("blur", this.blurHandler);
 
-    document.removeEventListener("scroll", this.scrollHandler);
+    this.scrollableContainer?.removeEventListener("scroll", this.scrollHandler);
   }
 
   getSelectionBoundingBox() {
