@@ -20,6 +20,7 @@ export type StyledText = {
   type: "text";
   text: string;
   styles: Styles;
+  attrs?: Record<string, Record<string, any>>;
 };
 
 export type Link = {

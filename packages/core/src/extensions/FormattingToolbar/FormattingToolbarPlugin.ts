@@ -123,7 +123,7 @@ export class FormattingToolbarView<BSchema extends BlockSchema> {
   };
 
   scrollHandler = () => {
-    if (this.formattingToolbarState?.show) {
+    if (this.formattingToolbarState) {
       this.formattingToolbarState.referencePos = this.getSelectionBoundingBox();
       this.updateFormattingToolbar();
     }

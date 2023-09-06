@@ -43,6 +43,11 @@ function styledTextToNodes(styledText: StyledText, schema: Schema): Node[] {
       marks.push(schema.mark(style, { color: value }));
     }
   }
+  if (styledText.attrs) {
+    for (const [type, value] of Object.entries(styledText.attrs)) {
+      marks.push(schema.mark(type, value));
+    }
+  }
 
   return (
     styledText.text
@@ -95,7 +100,10 @@ function styledTextArrayToNodes(
 
   if (typeof content === "string") {
     nodes.push(
-      ...styledTextToNodes({ type: "text", text: content, styles: {} }, schema)
+      ...styledTextToNodes(
+        { type: "text", text: content, styles: {}, attrs: {} },
+        schema
+      )
     );
     return nodes;
   }
@@ -208,6 +216,7 @@ function contentNodeToInlineContent(contentNode: Node) {
           type: "text",
           text: "\n",
           styles: {},
+          attrs: {},
         };
       }
 
@@ -215,6 +224,7 @@ function contentNodeToInlineContent(contentNode: Node) {
     }
 
     const styles: Styles = {};
+    const extendAttrs: Record<string, any> = {};
     let linkMark: Mark | undefined;
 
     for (const mark of node.marks) {
@@ -225,7 +235,7 @@ function contentNodeToInlineContent(contentNode: Node) {
       } else if (colorStyles.has(mark.type.name as ColorStyle)) {
         styles[mark.type.name as ColorStyle] = mark.attrs.color;
       } else {
-        throw Error("Mark is of an unrecognized type: " + mark.type.name);
+        extendAttrs[mark.type.name] = mark.attrs;
       }
     }
 
@@ -237,7 +247,8 @@ function contentNodeToInlineContent(contentNode: Node) {
         if (!linkMark) {
           // Node is text (same type as current content).
           if (
-            JSON.stringify(currentContent.styles) === JSON.stringify(styles)
+            JSON.stringify(currentContent.styles) === JSON.stringify(styles) &&
+            JSON.stringify(currentContent.attrs) === JSON.stringify(extendAttrs)
           ) {
             // Styles are the same.
             currentContent.text += node.textContent;
@@ -248,6 +259,7 @@ function contentNodeToInlineContent(contentNode: Node) {
               type: "text",
               text: node.textContent,
               styles,
+              attrs: extendAttrs,
             };
           }
         } else {
@@ -261,6 +273,7 @@ function contentNodeToInlineContent(contentNode: Node) {
                 type: "text",
                 text: node.textContent,
                 styles,
+                attrs: extendAttrs,
               },
             ],
           };
@@ -285,6 +298,7 @@ function contentNodeToInlineContent(contentNode: Node) {
                 type: "text",
                 text: node.textContent,
                 styles,
+                attrs: extendAttrs,
               });
             }
           } else {
@@ -298,6 +312,7 @@ function contentNodeToInlineContent(contentNode: Node) {
                   type: "text",
                   text: node.textContent,
                   styles,
+                  attrs: extendAttrs,
                 },
               ],
             };
@@ -309,6 +324,7 @@ function contentNodeToInlineContent(contentNode: Node) {
             type: "text",
             text: node.textContent,
             styles,
+            attrs: extendAttrs,
           };
         }
       }
@@ -321,6 +337,7 @@ function contentNodeToInlineContent(contentNode: Node) {
           type: "text",
           text: node.textContent,
           styles,
+          attrs: extendAttrs,
         };
       }
       // Node is a link.
@@ -333,6 +350,7 @@ function contentNodeToInlineContent(contentNode: Node) {
               type: "text",
               text: node.textContent,
               styles,
+              attrs: extendAttrs,
             },
           ],
         };
