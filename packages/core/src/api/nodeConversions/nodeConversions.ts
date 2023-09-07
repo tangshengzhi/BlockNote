@@ -128,6 +128,13 @@ export function inlineContentToNodes(
       nodes.push(...linkToNodes(content, schema));
     } else if (content.type === "text") {
       nodes.push(...styledTextArrayToNodes([content], schema));
+    } else if (schema.nodes[(content as any).type]) {
+      nodes.push(
+        schema.nodes[(content as any).type].create(
+          (content as any).attrs,
+          schema.text((content as any).text)
+        )
+      );
     } else {
       throw new UnreachableCaseError(content);
     }
@@ -193,7 +200,6 @@ export function blockToNode<BSchema extends BlockSchema>(
 function contentNodeToInlineContent(contentNode: Node) {
   const content: InlineContent[] = [];
   let currentContent: InlineContent | undefined = undefined;
-
   // Most of the logic below is for handling links because in ProseMirror links are marks
   // while in BlockNote links are a type of inline content
   contentNode.content.forEach((node) => {
@@ -332,16 +338,7 @@ function contentNodeToInlineContent(contentNode: Node) {
     // Current content does not exist.
     else {
       // Node is text.
-      if (!linkMark) {
-        currentContent = {
-          type: "text",
-          text: node.textContent,
-          styles,
-          attrs: extendAttrs,
-        };
-      }
-      // Node is a link.
-      else {
+      if (linkMark) {
         currentContent = {
           type: "link",
           href: linkMark.attrs.href,
@@ -354,6 +351,22 @@ function contentNodeToInlineContent(contentNode: Node) {
             },
           ],
         };
+      }
+      // Node is a link.
+      else if (node.type.name === "text") {
+        currentContent = {
+          type: "text",
+          text: node.textContent,
+          styles,
+          attrs: extendAttrs,
+        };
+      } else {
+        content.push({
+          type: node.type.name as any,
+          text: node.textContent,
+          styles,
+          attrs: { ...extendAttrs, ...node.attrs },
+        });
       }
     }
   });

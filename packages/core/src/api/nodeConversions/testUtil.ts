@@ -18,6 +18,7 @@ function textShorthandToStyledText(
         type: "text",
         text: content,
         styles: {},
+        attrs: {},
       },
     ];
   }

@@ -209,7 +209,7 @@ export class FormattingToolbarView<BSchema extends BlockSchema> {
     if (isNodeSelection(selection)) {
       const node = this.pmView.nodeDOM(from) as HTMLElement;
 
-      if (node) {
+      if (node?.getBoundingClientRect) {
         return node.getBoundingClientRect();
       }
     }

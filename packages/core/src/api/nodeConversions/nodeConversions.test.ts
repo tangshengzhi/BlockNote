@@ -145,6 +145,7 @@ describe("Complex ProseMirror Node Conversions", () => {
       defaultBlockSchema
     );
 
+    console.log("🚀 ~ file: nodeConversions.test.ts:149 ~ it ~ firstBlockConversion:", firstBlockConversion)
     expect(firstBlockConversion).toMatchSnapshot();
 
     const firstNodeConversion = blockToNode(firstBlockConversion, tt.schema);
