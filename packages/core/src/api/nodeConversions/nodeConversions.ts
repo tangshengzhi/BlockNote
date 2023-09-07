@@ -250,7 +250,22 @@ function contentNodeToInlineContent(contentNode: Node) {
     if (currentContent) {
       // Current content is text.
       if (currentContent.type === "text") {
-        if (!linkMark) {
+        if (linkMark) {
+          // Node is a link (different type to current content).
+          content.push(currentContent);
+          currentContent = {
+            type: "link",
+            href: linkMark.attrs.href,
+            content: [
+              {
+                type: "text",
+                text: node.textContent,
+                styles,
+                attrs: extendAttrs,
+              },
+            ],
+          };
+        } else if (node.type.name === "text") {
           // Node is text (same type as current content).
           if (
             JSON.stringify(currentContent.styles) === JSON.stringify(styles) &&
@@ -269,19 +284,12 @@ function contentNodeToInlineContent(contentNode: Node) {
             };
           }
         } else {
-          // Node is a link (different type to current content).
           content.push(currentContent);
           currentContent = {
-            type: "link",
-            href: linkMark.attrs.href,
-            content: [
-              {
-                type: "text",
-                text: node.textContent,
-                styles,
-                attrs: extendAttrs,
-              },
-            ],
+            type: node.type.name as any,
+            text: node.textContent,
+            styles,
+            attrs: { ...extendAttrs, ...node.attrs },
           };
         }
       } else if (currentContent.type === "link") {
@@ -331,6 +339,37 @@ function contentNodeToInlineContent(contentNode: Node) {
             text: node.textContent,
             styles,
             attrs: extendAttrs,
+          };
+        }
+      } else {
+        if (linkMark) {
+          currentContent = {
+            type: "link",
+            href: linkMark.attrs.href,
+            content: [
+              {
+                type: "text",
+                text: node.textContent,
+                styles,
+                attrs: extendAttrs,
+              },
+            ],
+          };
+        } else if (node.type.name === "text") {
+          content.push(currentContent);
+          currentContent = {
+            type: "text",
+            text: node.textContent,
+            styles,
+            attrs: extendAttrs,
+          };
+        } else {
+          content.push(currentContent);
+          currentContent = {
+            type: node.type.name as any,
+            text: node.textContent,
+            styles,
+            attrs: { ...extendAttrs, ...node.attrs },
           };
         }
       }
