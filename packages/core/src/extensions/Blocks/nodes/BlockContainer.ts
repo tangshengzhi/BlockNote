@@ -557,10 +557,16 @@ export const BlockContainer = Node.create<{
       // editor since the browser will try to use tab for keyboard navigation.
       Tab: () => {
         const state = this.editor.state;
-        const { node } = getBlockInfoFromPos(state.doc, state.selection.from)!;
+        const { contentType } = getBlockInfoFromPos(
+          state.doc,
+          state.selection.from
+        )!;
 
-        if (node.type.name === "paragraph") {
-          return false;
+        const isParagraph = contentType.name === "paragraph";
+
+        if (isParagraph) {
+          this.editor.commands.insertContent("\t");
+          return true;
         }
 
         this.editor.commands.sinkListItem("blockContainer");
@@ -568,10 +574,16 @@ export const BlockContainer = Node.create<{
       },
       "Shift-Tab": () => {
         const state = this.editor.state;
-        const { node } = getBlockInfoFromPos(state.doc, state.selection.from)!;
+        const { contentType } = getBlockInfoFromPos(
+          state.doc,
+          state.selection.from
+        )!;
 
-        if (node.type.name === "paragraph") {
-          return false;
+        const isParagraph = contentType.name === "paragraph";
+
+        if (isParagraph) {
+          this.editor.commands.insertContent("\t");
+          return true;
         }
 
         this.editor.commands.liftListItem("blockContainer");

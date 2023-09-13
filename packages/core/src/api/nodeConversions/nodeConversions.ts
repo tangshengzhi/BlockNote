@@ -132,7 +132,7 @@ export function inlineContentToNodes(
       nodes.push(
         schema.nodes[(content as any).type].create(
           (content as any).attrs,
-          schema.text((content as any).text)
+          (content as any).text ? schema.text((content as any).text) : undefined
         )
       );
     } else {
