@@ -556,10 +556,24 @@ export const BlockContainer = Node.create<{
       // Always returning true for tab key presses ensures they're not captured by the browser. Otherwise, they blur the
       // editor since the browser will try to use tab for keyboard navigation.
       Tab: () => {
+        const state = this.editor.state;
+        const { node } = getBlockInfoFromPos(state.doc, state.selection.from)!;
+
+        if (node.type.name === "paragraph") {
+          return false;
+        }
+
         this.editor.commands.sinkListItem("blockContainer");
         return true;
       },
       "Shift-Tab": () => {
+        const state = this.editor.state;
+        const { node } = getBlockInfoFromPos(state.doc, state.selection.from)!;
+
+        if (node.type.name === "paragraph") {
+          return false;
+        }
+
         this.editor.commands.liftListItem("blockContainer");
         return true;
       },
