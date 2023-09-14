@@ -614,12 +614,12 @@ export const BlockContainer = Node.create<{
             level: "3",
           },
         }),
-      "Mod-Shift-7": () =>
+      "Mod-Alt-9": () =>
         this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
           type: "bulletListItem",
           props: {},
         }),
-      "Mod-Shift-8": () =>
+      "Mod-Alt-7": () =>
         this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
           type: "numberedListItem",
           props: {},
