@@ -116,7 +116,7 @@ class HyperlinkToolbarView<BSchema extends BlockSchema> {
   };
 
   clickHandler = (event: MouseEvent) => {
-    const editorWrapper = this.pmView.dom.parentElement!;
+    const editorWrapper = this.pmView.dom.parentElement!.parentElement!;
 
     if (
       // Toolbar is open.
