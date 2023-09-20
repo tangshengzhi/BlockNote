@@ -449,33 +449,36 @@ export function nodeToBlock<BSchema extends BlockSchema>(
   }
 
   const props: any = {};
-  for (const [attr, value] of Object.entries({
-    ...node.attrs,
-    ...blockInfo.contentNode.attrs,
-  })) {
-    const blockSpec = blockSchema[blockInfo.contentType.name];
-    if (!blockSpec) {
-      throw Error(
-        "Block is of an unrecognized type: " + blockInfo.contentType.name
-      );
-    }
 
-    const propSchema = blockSpec.propSchema;
+  const blockSpec = blockSchema[blockInfo.contentType.name];
+  if (blockSpec) {
+    for (const [attr, value] of Object.entries({
+      ...node.attrs,
+      ...blockInfo.contentNode.attrs,
+    })) {
+      if (!blockSpec) {
+        throw Error(
+          "Block is of an unrecognized type: " + blockInfo.contentType.name
+        );
+      }
 
-    if (attr in propSchema) {
-      props[attr] = value;
-    }
-    // Block ids are stored as node attributes the same way props are, so we
-    // need to ensure we don't attempt to read block ids as props.
+      const propSchema = blockSpec.propSchema;
 
-    // the second check is for the backgroundColor & textColor props.
-    // Since we want them to be inherited by child blocks, we can't put them on the blockContent node,
-    // and instead have to put them on the blockContainer node.
-    // The blockContainer node is the same for all block types, but some custom blocks might not use backgroundColor & textColor,
-    // so these 2 props are technically unexpected but we shouldn't log a warning.
-    // (this is a bit hacky)
-    else if (attr !== "id" && !(attr in defaultProps)) {
-      console.warn("Block has an unrecognized attribute: " + attr);
+      if (attr in propSchema) {
+        props[attr] = value;
+      }
+      // Block ids are stored as node attributes the same way props are, so we
+      // need to ensure we don't attempt to read block ids as props.
+
+      // the second check is for the backgroundColor & textColor props.
+      // Since we want them to be inherited by child blocks, we can't put them on the blockContent node,
+      // and instead have to put them on the blockContainer node.
+      // The blockContainer node is the same for all block types, but some custom blocks might not use backgroundColor & textColor,
+      // so these 2 props are technically unexpected but we shouldn't log a warning.
+      // (this is a bit hacky)
+      else if (attr !== "id" && !(attr in defaultProps)) {
+        console.warn("Block has an unrecognized attribute: " + attr);
+      }
     }
   }
 
