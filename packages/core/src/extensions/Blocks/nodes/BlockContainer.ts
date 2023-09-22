@@ -454,8 +454,9 @@ export const BlockContainer = Node.create<{
           }),
       ]);
 
-    const handleEnter = () =>
-      this.editor.commands.first(({ commands }) => [
+    const handleEnter = () => {
+      return this.editor.commands.first(({ commands }) => [
+        () => commands.newlineInCode(),
         // Removes a level of nesting if the block is empty & indented, while the selection is also empty & at the start
         // of the block.
         () =>
@@ -549,6 +550,7 @@ export const BlockContainer = Node.create<{
             return false;
           }),
       ]);
+    };
 
     return {
       Backspace: handleBackspace,

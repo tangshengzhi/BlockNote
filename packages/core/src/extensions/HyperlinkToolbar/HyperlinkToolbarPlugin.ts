@@ -151,17 +151,21 @@ class HyperlinkToolbarView<BSchema extends BlockSchema> {
   };
 
   editHyperlink(url: string, text: string) {
-    const tr = this.pmView.state.tr.insertText(
-      text,
-      this.hyperlinkMarkRange!.from,
-      this.hyperlinkMarkRange!.to
-    );
-    tr.addMark(
-      this.hyperlinkMarkRange!.from,
-      this.hyperlinkMarkRange!.from + text.length,
-      this.pmView.state.schema.mark("link", { href: url })
-    );
+    const tr = this.pmView.state.tr
+      .insertText(
+        text,
+        this.hyperlinkMarkRange!.from,
+        this.hyperlinkMarkRange!.to
+      )
+      .addMark(
+        this.hyperlinkMarkRange!.from,
+        this.hyperlinkMarkRange!.from + text.length,
+        this.pmView.state.schema.mark("link", { href: url })
+      )
+      .setMeta("preventAutolink", true);
+
     this.pmView.dispatch(tr);
+
     this.pmView.focus();
 
     if (this.hyperlinkToolbarState?.show) {

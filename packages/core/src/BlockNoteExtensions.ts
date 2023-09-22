@@ -83,7 +83,11 @@ export const getBlockNoteExtensions = <BSchema extends BlockSchema>(opts: {
     Italic,
     Strike,
     Underline,
-    Link,
+    Link.configure({
+      linkOnPaste: true,
+      openOnClick: true,
+      autolink: true,
+    }),
     TextColorMark,
     TextColorExtension,
     BackgroundColorMark,
