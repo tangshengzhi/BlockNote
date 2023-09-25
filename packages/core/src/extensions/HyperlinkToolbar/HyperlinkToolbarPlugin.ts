@@ -62,7 +62,7 @@ class HyperlinkToolbarView<BSchema extends BlockSchema> {
       return false;
     };
 
-    this.pmView.dom.addEventListener("mouseover", this.mouseOverHandler);
+    // this.pmView.dom.addEventListener("mouseover", this.mouseOverHandler);
     document.addEventListener("click", this.clickHandler, true);
     setTimeout(() => {
       findScrollContainer(pmView.dom).addEventListener(
@@ -274,7 +274,7 @@ class HyperlinkToolbarView<BSchema extends BlockSchema> {
   }
 
   destroy() {
-    this.pmView.dom.removeEventListener("mouseover", this.mouseOverHandler);
+    // this.pmView.dom.removeEventListener("mouseover", this.mouseOverHandler);
     document.removeEventListener("scroll", this.scrollHandler);
     document.removeEventListener("click", this.clickHandler, true);
   }

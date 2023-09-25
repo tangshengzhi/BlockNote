@@ -558,6 +558,11 @@ export const BlockContainer = Node.create<{
       // Always returning true for tab key presses ensures they're not captured by the browser. Otherwise, they blur the
       // editor since the browser will try to use tab for keyboard navigation.
       Tab: () => {
+        if (this.editor.isActive("codeBlock")) {
+          this.editor.commands.insertContent("\t");
+          return true;
+        }
+
         const state = this.editor.state;
         const { contentType } = getBlockInfoFromPos(
           state.doc,
@@ -565,8 +570,9 @@ export const BlockContainer = Node.create<{
         )!;
 
         const isParagraph = contentType.name === "paragraph";
+        const isCodeblock = contentType.name === "codeBlock";
 
-        if (isParagraph) {
+        if (isParagraph || isCodeblock) {
           this.editor.commands.insertContent("\t");
           return true;
         }
