@@ -480,6 +480,10 @@ export function nodeToBlock<BSchema extends BlockSchema>(
         console.warn("Block has an unrecognized attribute: " + attr);
       }
     }
+  } else {
+    for (const [attr, value] of Object.entries(blockInfo.contentNode.attrs)) {
+      props[attr] = value;
+    }
   }
 
   const content = contentNodeToInlineContent(blockInfo.contentNode);

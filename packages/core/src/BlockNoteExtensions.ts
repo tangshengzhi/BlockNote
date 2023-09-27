@@ -51,7 +51,6 @@ export const getBlockNoteExtensions = <BSchema extends BlockSchema>(opts: {
   };
 }) => {
   const ret: Extensions = [
-    extensions.ClipboardTextSerializer,
     extensions.Commands,
     extensions.Editable,
     extensions.FocusEvents,
@@ -85,8 +84,8 @@ export const getBlockNoteExtensions = <BSchema extends BlockSchema>(opts: {
     Underline,
     Link.configure({
       linkOnPaste: true,
-      openOnClick: true,
-      autolink: true,
+      openOnClick: false,
+      autolink: false,
     }),
     TextColorMark,
     TextColorExtension,

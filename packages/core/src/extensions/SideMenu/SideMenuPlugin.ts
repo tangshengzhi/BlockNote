@@ -439,7 +439,7 @@ export class SideMenuView<BSchema extends BlockSchema> implements PluginView {
     }
 
     // Shows or updates elements.
-    if (this.editor.isEditable) {
+    if (this.editor.isEditable && this.hoveredBlock) {
       const blockContentBoundingBox = blockContent.getBoundingClientRect();
 
       this.sideMenuState = {
@@ -453,7 +453,7 @@ export class SideMenuView<BSchema extends BlockSchema> implements PluginView {
           blockContentBoundingBox.height
         ),
         block: this.editor.getBlock(
-          this.hoveredBlock!.getAttribute("data-id")!
+          this.hoveredBlock.getAttribute("data-id")!
         )!,
       };
 

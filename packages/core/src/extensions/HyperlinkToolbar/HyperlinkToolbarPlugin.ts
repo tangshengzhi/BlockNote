@@ -15,6 +15,22 @@ export type HyperlinkToolbarState = BaseUiElementState & {
   text: string;
 };
 
+export const composePath = (
+  el: HTMLElement,
+  unit = (el: HTMLElement) => el.tagName === "html"
+) => {
+  const path = [] as HTMLElement[];
+  while (el) {
+    path.push(el);
+
+    if (unit(el) || !el.parentElement) {
+      return path;
+    }
+    el = el.parentElement;
+  }
+  return path;
+};
+
 class HyperlinkToolbarView<BSchema extends BlockSchema> {
   private hyperlinkToolbarState?: HyperlinkToolbarState;
   public updateHyperlinkToolbar: () => void;
@@ -50,7 +66,7 @@ class HyperlinkToolbarView<BSchema extends BlockSchema> {
     this.startMenuUpdateTimer = () => {
       this.menuUpdateTimer = setTimeout(() => {
         this.update();
-      }, 250);
+      }, 500);
     };
 
     this.stopMenuUpdateTimer = () => {
@@ -62,7 +78,7 @@ class HyperlinkToolbarView<BSchema extends BlockSchema> {
       return false;
     };
 
-    // this.pmView.dom.addEventListener("mouseover", this.mouseOverHandler);
+    this.pmView.dom.addEventListener("mouseover", this.mouseOverHandler);
     document.addEventListener("click", this.clickHandler, true);
     setTimeout(() => {
       findScrollContainer(pmView.dom).addEventListener(
@@ -78,14 +94,16 @@ class HyperlinkToolbarView<BSchema extends BlockSchema> {
     this.mouseHoveredHyperlinkMarkRange = undefined;
 
     this.stopMenuUpdateTimer();
+    const path = composePath(
+      event.target as HTMLElement,
+      (el) => el.dataset.nodeType === "blockContainer" || el.nodeName === "HTML"
+    );
+    const target = path.find((el) => el.nodeName === "A");
 
-    if (
-      event.target instanceof HTMLAnchorElement &&
-      event.target.nodeName === "A"
-    ) {
+    if (target?.nodeName === "A") {
       // Finds link mark at the hovered element's position to update mouseHoveredHyperlinkMark and
       // mouseHoveredHyperlinkMarkRange.
-      const hoveredHyperlinkElement = event.target;
+      const hoveredHyperlinkElement = target;
       const posInHoveredHyperlinkMark =
         this.pmView.posAtDOM(hoveredHyperlinkElement, 0) + 1;
       const resolvedPosInHoveredHyperlinkMark = this.pmView.state.doc.resolve(
@@ -193,7 +211,7 @@ class HyperlinkToolbarView<BSchema extends BlockSchema> {
   }
 
   update() {
-    if (!this.pmView.hasFocus()) {
+    if (!this.pmView.hasFocus() && this.hyperlinkToolbarState?.show === true) {
       return;
     }
 
@@ -210,25 +228,25 @@ class HyperlinkToolbarView<BSchema extends BlockSchema> {
 
     // Finds link mark at the editor selection's position to update keyboardHoveredHyperlinkMark and
     // keyboardHoveredHyperlinkMarkRange.
-    if (this.pmView.state.selection.empty) {
-      const marksAtPos = this.pmView.state.selection.$from.marks();
+    // if (this.pmView.state.selection.empty) {
+    //   const marksAtPos = this.pmView.state.selection.$from.marks();
 
-      for (const mark of marksAtPos) {
-        if (
-          mark.type.name === this.pmView.state.schema.mark("link").type.name
-        ) {
-          this.keyboardHoveredHyperlinkMark = mark;
-          this.keyboardHoveredHyperlinkMarkRange =
-            getMarkRange(
-              this.pmView.state.selection.$from,
-              mark.type,
-              mark.attrs
-            ) || undefined;
+    //   for (const mark of marksAtPos) {
+    //     if (
+    //       mark.type.name === this.pmView.state.schema.mark("link").type.name
+    //     ) {
+    //       this.keyboardHoveredHyperlinkMark = mark;
+    //       this.keyboardHoveredHyperlinkMarkRange =
+    //         getMarkRange(
+    //           this.pmView.state.selection.$from,
+    //           mark.type,
+    //           mark.attrs
+    //         ) || undefined;
 
-          break;
-        }
-      }
-    }
+    //       break;
+    //     }
+    //   }
+    // }
 
     if (this.mouseHoveredHyperlinkMark) {
       this.hyperlinkMark = this.mouseHoveredHyperlinkMark;
@@ -274,7 +292,7 @@ class HyperlinkToolbarView<BSchema extends BlockSchema> {
   }
 
   destroy() {
-    // this.pmView.dom.removeEventListener("mouseover", this.mouseOverHandler);
+    this.pmView.dom.removeEventListener("mouseover", this.mouseOverHandler);
     document.removeEventListener("scroll", this.scrollHandler);
     document.removeEventListener("click", this.clickHandler, true);
   }

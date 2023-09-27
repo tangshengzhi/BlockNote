@@ -536,15 +536,26 @@ export const BlockContainer = Node.create<{
               state.selection.from
             )!;
 
-            const blockEmpty = node.textContent.length === 0;
+            let blockEmpty = node.textContent.length === 0;
+
+            if (
+              node.type.name === "blockContainer" &&
+              node.firstChild?.type.name === "paragraph"
+            ) {
+              node.firstChild.forEach((child) => {
+                if (child.type.name === "inlineIssue") {
+                  blockEmpty = false;
+                }
+              });
+            }
 
             if (!blockEmpty) {
-              chain()
+              const result = chain()
                 .deleteSelection()
                 .BNSplitBlock(state.selection.from, false)
                 .run();
 
-              return true;
+              return result;
             }
 
             return false;
