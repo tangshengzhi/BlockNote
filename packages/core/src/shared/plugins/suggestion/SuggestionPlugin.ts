@@ -6,6 +6,7 @@ import { findBlock } from "../../../extensions/Blocks/helpers/findBlock";
 import { BaseUiElementState } from "../../BaseUiElementTypes";
 import { SuggestionItem } from "./SuggestionItem";
 import { findScrollContainer } from "../../..";
+import { isActive } from "@tiptap/core";
 
 export type SuggestionsMenuState<T extends SuggestionItem> =
   BaseUiElementState & {
@@ -301,9 +302,15 @@ export const setupSuggestionsMenu = <
       props: {
         handleKeyDown(view, event) {
           const menuIsActive = (this as Plugin).getState(view.state).active;
-
           // Shows the menu if the default trigger character was pressed and the menu isn't active.
           if (event.key === defaultTriggerCharacter && !menuIsActive) {
+            if (
+              isActive(view.state, "codeBlock") ||
+              isActive(view.state, "code")
+            ) {
+              return false;
+            }
+
             view.dispatch(
               view.state.tr
                 .insertText(defaultTriggerCharacter)
