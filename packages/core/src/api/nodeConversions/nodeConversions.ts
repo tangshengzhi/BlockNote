@@ -129,10 +129,22 @@ export function inlineContentToNodes(
     } else if (content.type === "text") {
       nodes.push(...styledTextArrayToNodes([content], schema));
     } else if (schema.nodes[(content as any).type]) {
+      const children: Node[] = [];
+      const ctx = content as any;
+      if (ctx.content) {
+        if (typeof ctx.content === "string") {
+          children.push(schema.text(ctx.content));
+        } else {
+          children.push(...inlineContentToNodes(ctx.content, schema));
+        }
+      } else if (ctx.text) {
+        children.push(schema.text(ctx.text));
+      }
+
       nodes.push(
-        schema.nodes[(content as any).type].create(
-          (content as any).attrs,
-          (content as any).text ? schema.text((content as any).text) : undefined
+        schema.nodes[ctx.type].create(
+          ctx.attrs,
+          children.length ? children : undefined
         )
       );
     } else {
@@ -199,9 +211,30 @@ export function blockToNode<BSchema extends BlockSchema>(
  */
 function contentNodeToInlineContent(contentNode: Node) {
   const content: InlineContent[] = [];
+
+  if (contentNode.type.name === "taskList") {
+    contentNode.content.forEach((node) => {
+      if (node.type.name === "taskItem") {
+        const innerContent: InlineContent[] = [];
+
+        // contentNodeToInlineContent
+        node.content.forEach((node) => {
+          innerContent.push(...contentNodeToInlineContent(node));
+        });
+        content.push({
+          type: "taskItem",
+          content: innerContent,
+          attrs: node.attrs,
+        } as any);
+      }
+    });
+    return content;
+  }
+
   let currentContent: InlineContent | undefined = undefined;
   // Most of the logic below is for handling links because in ProseMirror links are marks
   // while in BlockNote links are a type of inline content
+
   contentNode.content.forEach((node) => {
     // hardBreak nodes do not have an InlineContent equivalent, instead we
     // add a newline to the previous node.
