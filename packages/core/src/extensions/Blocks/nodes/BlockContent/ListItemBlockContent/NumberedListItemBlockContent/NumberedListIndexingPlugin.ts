@@ -48,8 +48,9 @@ export const NumberedListIndexingPlugin = () => {
 
               if (isPrevBlockOrderedListItem) {
                 const prevBlockIndex = prevBlockContentNode.attrs["index"];
-
                 newIndex = (parseInt(prevBlockIndex) + 1).toString();
+              } else if (blockInfo.contentNode) {
+                return;
               }
             }
           }

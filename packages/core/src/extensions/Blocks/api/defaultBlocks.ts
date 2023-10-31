@@ -36,7 +36,13 @@ export const defaultBlockSchema = {
     node: BulletListItemBlockContent,
   },
   numberedListItem: {
-    propSchema: defaultProps,
+    propSchema: {
+      ...defaultProps,
+      index: {
+        default: "1",
+        values: Array(100).map((_, i) => `${i + 1}`) as string[],
+      },
+    },
     node: NumberedListItemBlockContent,
   },
 } as const;
