@@ -586,8 +586,9 @@ export const BlockContainer = Node.create<{
 
         const isParagraph = contentType.name === "paragraph";
         const isCodeblock = contentType.name === "codeBlock";
+        const isQuote = contentType.name === "blockquote";
 
-        if (isParagraph || isCodeblock) {
+        if (isParagraph || isCodeblock || isQuote) {
           this.editor.commands.insertContent("\t");
           return true;
         }
