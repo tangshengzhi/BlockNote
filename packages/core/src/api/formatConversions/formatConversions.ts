@@ -46,6 +46,12 @@ export async function HTMLToBlocks<BSchema extends BlockSchema>(
   const htmlNode = document.createElement("div");
   htmlNode.innerHTML = html.trim();
 
+  htmlNode.querySelectorAll("ol").forEach((ol) =>
+    ol.querySelectorAll("&>li").forEach((li, index) => {
+      (li as HTMLLIElement).dataset["index"] = `${index + 1}`;
+    })
+  );
+
   const parser = DOMParser.fromSchema(schema);
   const parentNode = parser.parse(htmlNode); //, { preserveWhitespace: "full" });
 
