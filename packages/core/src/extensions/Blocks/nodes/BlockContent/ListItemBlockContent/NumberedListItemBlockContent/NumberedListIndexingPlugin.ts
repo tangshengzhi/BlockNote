@@ -1,4 +1,5 @@
 import { Plugin, PluginKey } from "prosemirror-state";
+import { Node } from "prosemirror-model";
 import { getBlockInfoFromPos } from "../../../../helpers/getBlockInfoFromPos";
 
 // ProseMirror Plugin which automatically assigns indices to ordered list items per nesting level.
@@ -21,6 +22,8 @@ export const NumberedListIndexingPlugin = () => {
           node.firstChild!.type.name === "numberedListItem"
         ) {
           let newIndex = "1";
+          let newLevel = "1";
+
           const isFirstBlockInDoc = pos === 1;
 
           const blockInfo = getBlockInfoFromPos(tr.doc, pos + 1)!;
@@ -39,6 +42,17 @@ export const NumberedListIndexingPlugin = () => {
             const isFirstBlockInNestingLevel =
               blockInfo.depth !== prevBlockInfo.depth;
 
+            const path: Node[] = [];
+            tr.doc.nodesBetween(pos, pos, (node2) => {
+              if (node.attrs.id && node.type.name === "blockContainer") {
+                const content = node.firstChild!;
+                if (content && content.type.name === "numberedListItem") {
+                  path.push(node2);
+                }
+              }
+            });
+            newLevel = ((path.length + 1) / 2).toString();
+
             if (!isFirstBlockInNestingLevel) {
               const prevBlockContentNode = prevBlockInfo.contentNode;
               const prevBlockContentType = prevBlockInfo.contentType;
@@ -47,7 +61,8 @@ export const NumberedListIndexingPlugin = () => {
                 prevBlockContentType.name === "numberedListItem";
 
               if (isPrevBlockOrderedListItem) {
-                const prevBlockIndex = prevBlockContentNode.attrs["index"];
+                const prevBlockIndex =
+                  prevBlockContentNode.attrs["index"] || "1";
                 newIndex = (parseInt(prevBlockIndex) + 1).toString();
               } else if (blockInfo.contentNode) {
                 return;
@@ -57,12 +72,14 @@ export const NumberedListIndexingPlugin = () => {
 
           const contentNode = blockInfo.contentNode;
           const index = contentNode.attrs["index"];
+          const level = contentNode.attrs["level"];
 
-          if (index !== newIndex) {
+          if (index !== newIndex || level !== newLevel) {
             modified = true;
 
             tr.setNodeMarkup(pos + 1, undefined, {
               index: newIndex,
+              level: newLevel,
             });
           }
         }

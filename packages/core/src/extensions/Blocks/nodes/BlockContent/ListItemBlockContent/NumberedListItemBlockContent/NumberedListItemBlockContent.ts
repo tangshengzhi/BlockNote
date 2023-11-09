@@ -21,6 +21,15 @@ export const NumberedListItemBlockContent =
             };
           },
         },
+        level: {
+          default: "1",
+          parseHTML: (element) => element.getAttribute("data-level"),
+          renderHTML: (attributes) => {
+            return {
+              "data-level": attributes.level,
+            };
+          },
+        },
       };
     },
 
@@ -106,11 +115,14 @@ export const NumberedListItemBlockContent =
       ];
     },
 
-    renderHTML({ HTMLAttributes }) {
+    renderHTML({ HTMLAttributes, node }) {
       const blockContentDOMAttributes =
         this.options.domAttributes?.blockContent || {};
       const inlineContentDOMAttributes =
         this.options.domAttributes?.inlineContent || {};
+
+      const index = Number.parseInt(node.attrs.index || "1");
+      const level = Number.parseInt(node.attrs.level || "1");
 
       return [
         "div",
@@ -120,6 +132,7 @@ export const NumberedListItemBlockContent =
             blockContentDOMAttributes.class
           ),
           "data-content-type": this.name,
+          "data-num-char": generateValue(index, level),
         }),
         // we use a <p> tag, because for <li> tags we'd need to add a <ul> parent for around siblings to be semantically correct,
         // which would be quite cumbersome
@@ -136,3 +149,50 @@ export const NumberedListItemBlockContent =
       ];
     },
   });
+
+function generateValue(index: number, level: number) {
+  if (level === 1) {
+    return index.toString();
+  } else if (level === 2) {
+    const base = "a".charCodeAt(0) - 1; // 'a' 的 ASCII 值减 1
+    let suffix = "";
+    while (index > 0) {
+      let remainder = index % 26;
+      if (remainder === 0) {
+        remainder = 26;
+      }
+      suffix = String.fromCharCode(base + remainder) + suffix;
+      index = Math.floor((index - remainder) / 26);
+    }
+    return suffix;
+  } else {
+    return convertToRoman(index);
+  }
+}
+
+function convertToRoman(num: number) {
+  const romanNumerals = [
+    { value: 1000, symbol: "M" },
+    { value: 900, symbol: "CM" },
+    { value: 500, symbol: "D" },
+    { value: 400, symbol: "CD" },
+    { value: 100, symbol: "C" },
+    { value: 90, symbol: "XC" },
+    { value: 50, symbol: "L" },
+    { value: 40, symbol: "XL" },
+    { value: 10, symbol: "X" },
+    { value: 9, symbol: "IX" },
+    { value: 5, symbol: "V" },
+    { value: 4, symbol: "IV" },
+    { value: 1, symbol: "I" },
+  ];
+
+  let result = "";
+  for (let i = 0; i < romanNumerals.length; i++) {
+    while (num >= romanNumerals[i].value) {
+      result += romanNumerals[i].symbol;
+      num -= romanNumerals[i].value;
+    }
+  }
+  return result;
+}
