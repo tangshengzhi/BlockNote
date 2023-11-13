@@ -64,7 +64,7 @@ export const NumberedListIndexingPlugin = () => {
               if (isPrevBlockOrderedListItem) {
                 const prevBlockIndex =
                   nodeModifiedIndex.get(prevBlockContentNode) ||
-                  prevBlockContentNode.attrs["index"] ||
+                  // prevBlockContentNode.attrs["index"] ||
                   "1";
 
                 newIndex = (parseInt(prevBlockIndex) + 1).toString();
@@ -84,6 +84,7 @@ export const NumberedListIndexingPlugin = () => {
             modified = true;
 
             tr.setNodeMarkup(pos + 1, undefined, {
+              ...contentNode.attrs,
               index: newIndex,
               level: newLevel,
             });
