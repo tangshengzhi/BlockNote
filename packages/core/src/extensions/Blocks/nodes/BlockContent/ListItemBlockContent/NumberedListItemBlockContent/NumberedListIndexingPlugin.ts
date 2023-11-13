@@ -43,6 +43,13 @@ export const NumberedListIndexingPlugin = () => {
             const isFirstBlockInNestingLevel =
               blockInfo.depth !== prevBlockInfo.depth;
 
+            if (
+              blockInfo.contentType.name === "numberedListItem" &&
+              prevBlockInfo.contentType.name !== "numberedListItem"
+            ) {
+              nodeModifiedIndex.set(blockInfo.contentNode, "1");
+            }
+
             const path: Node[] = [];
             tr.doc.nodesBetween(pos, pos, (node2) => {
               if (node.attrs.id && node.type.name === "blockContainer") {
@@ -64,12 +71,10 @@ export const NumberedListIndexingPlugin = () => {
               if (isPrevBlockOrderedListItem) {
                 const prevBlockIndex =
                   nodeModifiedIndex.get(prevBlockContentNode) ||
-                  // prevBlockContentNode.attrs["index"] ||
+                  prevBlockContentNode.attrs["index"] ||
                   "1";
 
                 newIndex = (parseInt(prevBlockIndex) + 1).toString();
-              } else if (blockInfo.contentNode) {
-                return;
               }
             }
           }
