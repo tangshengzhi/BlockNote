@@ -42,6 +42,10 @@ export const defaultBlockSchema = {
         default: "1",
         values: Array(100).map((_, i) => `${i + 1}`) as string[],
       },
+      level: {
+        default: "1",
+        values: Array(100).map((_, i) => `${i + 1}`) as string[],
+      },
     },
     node: NumberedListItemBlockContent,
   },

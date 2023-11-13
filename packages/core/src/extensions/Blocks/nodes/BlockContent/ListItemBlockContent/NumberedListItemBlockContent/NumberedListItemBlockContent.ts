@@ -132,7 +132,7 @@ export const NumberedListItemBlockContent =
             blockContentDOMAttributes.class
           ),
           "data-content-type": this.name,
-          "data-num-char": generateValue(index, level),
+          "data-num-char": generateIndexChar(index, level),
         }),
         // we use a <p> tag, because for <li> tags we'd need to add a <ul> parent for around siblings to be semantically correct,
         // which would be quite cumbersome
@@ -150,7 +150,7 @@ export const NumberedListItemBlockContent =
     },
   });
 
-function generateValue(index: number, level: number) {
+function generateIndexChar(index: number, level: number) {
   if (level === 1) {
     return index.toString();
   } else if (level === 2) {
@@ -165,8 +165,10 @@ function generateValue(index: number, level: number) {
       index = Math.floor((index - remainder) / 26);
     }
     return suffix;
-  } else {
+  } else if (level === 3) {
     return convertToRoman(index);
+  } else {
+    return index.toString();
   }
 }
 

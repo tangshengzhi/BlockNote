@@ -16,6 +16,7 @@ export const NumberedListIndexingPlugin = () => {
       // Traverses each node the doc using DFS, so blocks which are on the same nesting level will be traversed in the
       // same order they appear. This means the index of each list item block can be calculated by incrementing the
       // index of the previous list item block.
+      const nodeModifiedIndex = new Map<Node, string>();
       newState.doc.descendants((node, pos) => {
         if (
           node.type.name === "blockContainer" &&
@@ -62,7 +63,10 @@ export const NumberedListIndexingPlugin = () => {
 
               if (isPrevBlockOrderedListItem) {
                 const prevBlockIndex =
-                  prevBlockContentNode.attrs["index"] || "1";
+                  nodeModifiedIndex.get(prevBlockContentNode) ||
+                  prevBlockContentNode.attrs["index"] ||
+                  "1";
+
                 newIndex = (parseInt(prevBlockIndex) + 1).toString();
               } else if (blockInfo.contentNode) {
                 return;
@@ -73,6 +77,8 @@ export const NumberedListIndexingPlugin = () => {
           const contentNode = blockInfo.contentNode;
           const index = contentNode.attrs["index"];
           const level = contentNode.attrs["level"];
+
+          nodeModifiedIndex.set(contentNode, newIndex);
 
           if (index !== newIndex || level !== newLevel) {
             modified = true;
