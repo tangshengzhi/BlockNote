@@ -460,6 +460,7 @@ const getComplexBlocks = (): Block[] => [
               textColor: "default",
               textAlignment: "left",
               index: "1",
+              level: "1",
             },
             content: [
               {
@@ -497,6 +498,7 @@ const getComplexBlocks = (): Block[] => [
               textColor: "default",
               textAlignment: "left",
               index: "1",
+              level: "1",
             },
             content: [
               {

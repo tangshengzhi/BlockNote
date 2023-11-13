@@ -398,10 +398,12 @@ function contentNodeToInlineContent(contentNode: Node) {
           };
         } else {
           content.push(currentContent);
+
           currentContent = {
             type: node.type.name as any,
             text: node.textContent,
             styles,
+            content: contentNodeToInlineContent(node) as any,
             attrs: { ...extendAttrs, ...node.attrs },
           };
         }
@@ -437,6 +439,8 @@ function contentNodeToInlineContent(contentNode: Node) {
           type: node.type.name as any,
           text: node.textContent,
           styles,
+          content: contentNodeToInlineContent(node) as any,
+
           attrs: { ...extendAttrs, ...node.attrs },
         });
       }
