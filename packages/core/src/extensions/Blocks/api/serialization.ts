@@ -1,5 +1,5 @@
 import { Extension } from "@tiptap/core";
-import { Plugin } from "prosemirror-state";
+import { Plugin, PluginKey } from "prosemirror-state";
 import { DOMSerializer, Schema } from "prosemirror-model";
 
 const customBlockSerializer = (schema: Schema) => {
@@ -17,9 +17,11 @@ const customBlockSerializer = (schema: Schema) => {
   );
 };
 export const CustomBlockSerializerExtension = Extension.create({
+  name: "customBlockSerializer",
   addProseMirrorPlugins() {
     return [
       new Plugin({
+        key: new PluginKey("customBlockSerializer"),
         props: {
           clipboardSerializer: customBlockSerializer(this.editor.schema),
         },
