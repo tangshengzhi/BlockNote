@@ -5,6 +5,7 @@ export * from "./extensions/Blocks/api/blockTypes";
 export * from "./extensions/Blocks/api/defaultBlocks";
 export * from "./extensions/Blocks/api/inlineContentTypes";
 export * from "./extensions/Blocks/api/serialization";
+export * from "./extensions/Blocks/helpers/getBlockInfoFromPos";
 export * as blockStyles from "./extensions/Blocks/nodes/Block.module.css";
 export * from "./extensions/FormattingToolbar/FormattingToolbarPlugin";
 export * from "./extensions/HyperlinkToolbar/HyperlinkToolbarPlugin";
