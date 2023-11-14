@@ -5,6 +5,7 @@ import {
   blockToNode,
   inlineContentToNodes,
 } from "../../../api/nodeConversions/nodeConversions";
+import { isInTable } from 'prosemirror-tables'
 
 import {
   BlockNoteDOMAttributes,
@@ -394,11 +395,14 @@ export const BlockContainer = Node.create<{
         // Reverts block content type to a paragraph if the selection is at the start of the block.
         () =>
           commands.command(({ state }) => {
+            if (isInTable(state)) {
+              return false;
+            }
             const { contentType, contentNode } = getBlockInfoFromPos(
               state.doc,
               state.selection.from
             )!;
-
+            
             const selectionAtBlockStart =
               state.selection.$anchor.parentOffset === 0;
             const isParagraph = contentType.name === "paragraph";
@@ -419,6 +423,9 @@ export const BlockContainer = Node.create<{
         // Removes a level of nesting if the block is indented if the selection is at the start of the block.
         () =>
           commands.command(({ state }) => {
+            if (isInTable(state)) {
+              return false;
+            }
             const selectionAtBlockStart =
               state.selection.$anchor.parentOffset === 0;
 
@@ -432,6 +439,9 @@ export const BlockContainer = Node.create<{
         // is at the start of the block.
         () =>
           commands.command(({ state }) => {
+            if (isInTable(state)) {
+              return false;
+            }
             const { depth, startPos } = getBlockInfoFromPos(
               state.doc,
               state.selection.from
