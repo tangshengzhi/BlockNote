@@ -151,9 +151,9 @@ export const NumberedListItemBlockContent =
   });
 
 function generateIndexChar(index: number, level: number) {
-  if (level === 1) {
+  if (level % 3 === 1) {
     return index.toString();
-  } else if (level === 2) {
+  } else if (level % 3 === 2) {
     const base = "a".charCodeAt(0) - 1; // 'a' 的 ASCII 值减 1
     let suffix = "";
     while (index > 0) {
@@ -165,7 +165,7 @@ function generateIndexChar(index: number, level: number) {
       index = Math.floor((index - remainder) / 26);
     }
     return suffix;
-  } else if (level === 3) {
+  } else if (level % 3 === 0) {
     return convertToRoman(index);
   } else {
     return index.toString();
