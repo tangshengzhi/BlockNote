@@ -306,7 +306,7 @@ export const setupSuggestionsMenu = <
           if (event.key === defaultTriggerCharacter && !menuIsActive) {
             if (
               isActive(view.state, "codeBlock") ||
-              isActive(view.state, "code") || 
+              isActive(view.state, "code") ||
               isActive(view.state, "Table")
             ) {
               return false;
@@ -315,7 +315,7 @@ export const setupSuggestionsMenu = <
             view.dispatch(
               view.state.tr
                 .insertText(defaultTriggerCharacter)
-                .scrollIntoView()
+                // .scrollIntoView()
                 .setMeta(pluginKey, {
                   activate: true,
                   triggerCharacter: defaultTriggerCharacter,
