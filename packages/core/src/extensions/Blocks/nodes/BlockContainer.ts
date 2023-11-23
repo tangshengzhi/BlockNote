@@ -481,13 +481,8 @@ export const BlockContainer = Node.create<{
 
             const selectionAtBlockStart =
               state.selection.$anchor.parentOffset === 0;
-            const isParagraph = contentType.name === "paragraph";
 
-            if (
-              selectionAtBlockStart &&
-              !isParagraph &&
-              contentNode.childCount === 0
-            ) {
+            if (selectionAtBlockStart && contentNode.childCount === 0) {
               return commands.BNDeleteBlock(state.selection.from);
             }
             return false;
