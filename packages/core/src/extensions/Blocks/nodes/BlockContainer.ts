@@ -472,11 +472,35 @@ export const BlockContainer = Node.create<{
       this.editor.commands.first(({ commands }) => [
         // Deletes the selection if it's not empty.
         () => commands.deleteSelection(),
+        () =>
+          commands.command(({ state }) => {
+            const { contentType, contentNode } = getBlockInfoFromPos(
+              state.doc,
+              state.selection.from
+            )!;
+
+            const selectionAtBlockStart =
+              state.selection.$anchor.parentOffset === 0;
+            const isParagraph = contentType.name === "paragraph";
+
+            if (
+              selectionAtBlockStart &&
+              !isParagraph &&
+              contentNode.childCount === 0
+            ) {
+              return commands.BNDeleteBlock(state.selection.from);
+            }
+            return false;
+          }),
         // Merges block with the next one (at the same nesting level or lower),
         // if one exists, the block has no children, and the selection is at the
         // end of the block.
         () =>
           commands.command(({ state }) => {
+            if (isInTable(state)) {
+              return false;
+            }
+
             const { node, contentNode, depth, endPos } = getBlockInfoFromPos(
               state.doc,
               state.selection.from
