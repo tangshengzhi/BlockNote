@@ -59,16 +59,22 @@ export class FormattingToolbarView<BSchema extends BlockSchema> {
       updateFormattingToolbar(this.formattingToolbarState);
     };
 
-    pmView.dom.addEventListener("mousedown", this.viewMousedownHandler);
-    pmView.dom.addEventListener("mouseup", this.viewMouseupHandler);
     pmView.dom.addEventListener("dragstart", this.dragstartHandler);
 
     pmView.dom.addEventListener("focus", this.focusHandler);
     pmView.dom.addEventListener("blur", this.blurHandler);
 
     setTimeout(() => {
-      this.scrollableContainer = findScrollContainer(pmView.dom);
+      this.scrollableContainer = findScrollContainer(pmView.dom) || pmView.dom;
       this.scrollableContainer.addEventListener("scroll", this.scrollHandler);
+      this.scrollableContainer.addEventListener(
+        "mousedown",
+        this.viewMousedownHandler
+      );
+      this.scrollableContainer.addEventListener(
+        "mouseup",
+        this.viewMouseupHandler
+      );
     });
   }
 
@@ -187,8 +193,14 @@ export class FormattingToolbarView<BSchema extends BlockSchema> {
   }
 
   destroy() {
-    this.pmView.dom.removeEventListener("mousedown", this.viewMousedownHandler);
-    this.pmView.dom.removeEventListener("mouseup", this.viewMouseupHandler);
+    this.scrollableContainer?.removeEventListener(
+      "mousedown",
+      this.viewMousedownHandler
+    );
+    this.scrollableContainer?.removeEventListener(
+      "mouseup",
+      this.viewMouseupHandler
+    );
     this.pmView.dom.removeEventListener("dragstart", this.dragstartHandler);
 
     this.pmView.dom.removeEventListener("focus", this.focusHandler);
