@@ -466,8 +466,8 @@ export class SideMenuView<BSchema extends BlockSchema> implements PluginView {
   };
 
   onScroll = () => {
-    if (this.sideMenuState?.show) {
-      const blockContent = this.hoveredBlock!.firstChild as HTMLElement;
+    if (this.sideMenuState?.show && this.hoveredBlock) {
+      const blockContent = this.hoveredBlock.firstChild as HTMLElement;
       const blockContentBoundingBox = blockContent.getBoundingClientRect();
 
       this.sideMenuState.referencePos = new DOMRect(
