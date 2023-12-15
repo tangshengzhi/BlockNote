@@ -26,6 +26,20 @@ export const BulletListItemBlockContent = createTipTapBlock<"bulletListItem">({
     ];
   },
 
+  addAttributes() {
+    return {
+      level: {
+        default: "1",
+        parseHTML: (element) => element.getAttribute("data-level"),
+        renderHTML: (attributes) => {
+          return {
+            "data-level": attributes.level,
+          };
+        },
+      },
+    };
+  },
+
   addKeyboardShortcuts() {
     return {
       Enter: () => handleEnter(this.editor),

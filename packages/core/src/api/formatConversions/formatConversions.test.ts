@@ -46,6 +46,7 @@ const getNonNestedBlocks = (): Block[] => [
     props: {
       backgroundColor: "default",
       textColor: "default",
+      level: "1",
       textAlignment: "left",
     },
     content: [
@@ -119,6 +120,7 @@ const getNestedBlocks = (): Block[] => [
               backgroundColor: "default",
               textColor: "default",
               textAlignment: "left",
+              level: "1",
             },
             content: [
               {
@@ -376,6 +378,7 @@ const getComplexBlocks = (): Block[] => [
       backgroundColor: "default",
       textColor: "default",
       textAlignment: "left",
+      level: "1",
     },
     content: [
       {
@@ -393,6 +396,7 @@ const getComplexBlocks = (): Block[] => [
       backgroundColor: "default",
       textColor: "default",
       textAlignment: "left",
+      level: "1",
     },
     content: [
       {
@@ -409,6 +413,7 @@ const getComplexBlocks = (): Block[] => [
           backgroundColor: "default",
           textColor: "default",
           textAlignment: "left",
+          level: "1",
         },
         content: [
           {
@@ -425,6 +430,7 @@ const getComplexBlocks = (): Block[] => [
               backgroundColor: "default",
               textColor: "default",
               textAlignment: "left",
+              level: "1",
             },
             content: [
               {
@@ -536,6 +542,7 @@ const getComplexBlocks = (): Block[] => [
               backgroundColor: "default",
               textColor: "default",
               textAlignment: "left",
+              level: "1",
             },
             content: [
               {
@@ -555,6 +562,7 @@ const getComplexBlocks = (): Block[] => [
           backgroundColor: "default",
           textColor: "default",
           textAlignment: "left",
+          level: "1",
         },
         content: [
           {
@@ -574,6 +582,7 @@ const getComplexBlocks = (): Block[] => [
       backgroundColor: "default",
       textColor: "default",
       textAlignment: "left",
+      level: "1",
     },
     content: [
       {

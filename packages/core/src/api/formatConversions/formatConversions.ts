@@ -38,6 +38,22 @@ export async function blocksToHTML<BSchema extends BlockSchema>(
   return htmlString.value as string;
 }
 
+function setItemLevel(dom: HTMLElement, currentLevel: number) {
+  if (dom.tagName === "OL" || dom.tagName === "UL") {
+    currentLevel++;
+  }
+
+  if (dom.tagName === "LI") {
+    dom.dataset["level"] = `${currentLevel}`;
+  }
+
+  dom.childNodes.forEach((child) => {
+    if (child instanceof HTMLElement) {
+      setItemLevel(child, currentLevel);
+    }
+  });
+}
+
 export async function HTMLToBlocks<BSchema extends BlockSchema>(
   html: string,
   blockSchema: BSchema,
@@ -52,6 +68,8 @@ export async function HTMLToBlocks<BSchema extends BlockSchema>(
     });
     ol.removeAttribute("start");
   });
+
+  setItemLevel(htmlNode, 0);
 
   const parser = DOMParser.fromSchema(schema);
   const parentNode = parser.parse(htmlNode); //, { preserveWhitespace: "full" });

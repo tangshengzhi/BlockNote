@@ -32,7 +32,13 @@ export const defaultBlockSchema = {
     node: HeadingBlockContent,
   },
   bulletListItem: {
-    propSchema: defaultProps,
+    propSchema: {
+      ...defaultProps,
+      level: {
+        default: "1",
+        values: Array(100).map((_, i) => `${i + 1}`) as string[],
+      },
+    },
     node: BulletListItemBlockContent,
   },
   numberedListItem: {
