@@ -6,9 +6,17 @@ import type { BlockNoteEditor } from "../../editor/BlockNoteEditor";
 import {
   BaseUiElementCallbacks,
   BaseUiElementState,
+<<<<<<< HEAD
 } from "../../extensions-shared/BaseUiElementTypes";
 import { BlockSchema, InlineContentSchema, StyleSchema } from "../../schema";
 import { EventEmitter } from "../../util/EventEmitter";
+=======
+  BlockNoteEditor,
+  BlockSchema,
+  findScrollContainer,
+} from "../..";
+import { EventEmitter } from "../../shared/EventEmitter";
+>>>>>>> mine
 
 export type FormattingToolbarCallbacks = BaseUiElementCallbacks;
 
@@ -21,6 +29,8 @@ export class FormattingToolbarView {
   public preventHide = false;
   public preventShow = false;
   public prevWasEditable: boolean | null = null;
+
+  private scrollableContainer: HTMLElement | Document | null = null;
 
   public shouldShow: (props: {
     view: EditorView;
@@ -50,14 +60,23 @@ export class FormattingToolbarView {
       updateFormattingToolbar(this.formattingToolbarState);
     };
 
-    pmView.dom.addEventListener("mousedown", this.viewMousedownHandler);
-    pmView.dom.addEventListener("mouseup", this.viewMouseupHandler);
     pmView.dom.addEventListener("dragstart", this.dragstartHandler);
 
     pmView.dom.addEventListener("focus", this.focusHandler);
     pmView.dom.addEventListener("blur", this.blurHandler);
 
-    document.addEventListener("scroll", this.scrollHandler);
+    setTimeout(() => {
+      this.scrollableContainer = findScrollContainer(pmView.dom) || pmView.dom;
+      this.scrollableContainer.addEventListener("scroll", this.scrollHandler);
+      this.scrollableContainer.addEventListener(
+        "mousedown",
+        this.viewMousedownHandler
+      );
+      this.scrollableContainer.addEventListener(
+        "mouseup",
+        this.viewMouseupHandler
+      );
+    });
   }
 
   viewMousedownHandler = () => {
@@ -111,7 +130,7 @@ export class FormattingToolbarView {
   };
 
   scrollHandler = () => {
-    if (this.formattingToolbarState?.show) {
+    if (this.formattingToolbarState) {
       this.formattingToolbarState.referencePos = this.getSelectionBoundingBox();
       this.updateFormattingToolbar();
     }
@@ -175,14 +194,20 @@ export class FormattingToolbarView {
   }
 
   destroy() {
-    this.pmView.dom.removeEventListener("mousedown", this.viewMousedownHandler);
-    this.pmView.dom.removeEventListener("mouseup", this.viewMouseupHandler);
+    this.scrollableContainer?.removeEventListener(
+      "mousedown",
+      this.viewMousedownHandler
+    );
+    this.scrollableContainer?.removeEventListener(
+      "mouseup",
+      this.viewMouseupHandler
+    );
     this.pmView.dom.removeEventListener("dragstart", this.dragstartHandler);
 
     this.pmView.dom.removeEventListener("focus", this.focusHandler);
     this.pmView.dom.removeEventListener("blur", this.blurHandler);
 
-    document.removeEventListener("scroll", this.scrollHandler);
+    this.scrollableContainer?.removeEventListener("scroll", this.scrollHandler);
   }
 
   getSelectionBoundingBox() {
@@ -197,7 +222,7 @@ export class FormattingToolbarView {
     if (isNodeSelection(selection)) {
       const node = this.pmView.nodeDOM(from) as HTMLElement;
 
-      if (node) {
+      if (node?.getBoundingClientRect) {
         return node.getBoundingClientRect();
       }
     }

@@ -61,7 +61,6 @@ const extraFields: Record<
     group: "Basic blocks",
     icon: <RiText size={18} />,
     hint: "Used for the body of your document",
-    shortcut: formatKeyboardShortcut("Mod-Alt-0"),
   },
   Table: {
     group: "Advanced",

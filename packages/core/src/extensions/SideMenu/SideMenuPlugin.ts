@@ -2,6 +2,7 @@ import { PluginView } from "@tiptap/pm/state";
 import { Node } from "prosemirror-model";
 import { NodeSelection, Plugin, PluginKey, Selection } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
+<<<<<<< HEAD
 import { createExternalHTMLExporter } from "../../api/exporters/html/externalHTMLExporter";
 import { createInternalHTMLSerializer } from "../../api/exporters/html/internalHTMLSerializer";
 import { cleanHTMLToMarkdown } from "../../api/exporters/markdown/markdownExporter";
@@ -15,10 +16,26 @@ import {
   StyleSchema,
 } from "../../schema";
 import { EventEmitter } from "../../util/EventEmitter";
+=======
+import { BlockNoteEditor } from "../../BlockNoteEditor";
+// import styles from "../../editor.module.css";
+import { BaseUiElementState } from "../../shared/BaseUiElementTypes";
+import { EventEmitter } from "../../shared/EventEmitter";
+import { Block, BlockSchema } from "../Blocks/api/blockTypes";
+import { getBlockInfoFromPos } from "../Blocks/helpers/getBlockInfoFromPos";
+>>>>>>> mine
 import { slashMenuPluginKey } from "../SlashMenu/SlashMenuPlugin";
 import { MultipleNodeSelection } from "./MultipleNodeSelection";
+import { findScrollContainer } from "../..";
 
+<<<<<<< HEAD
 let dragImageElement: Element | undefined;
+=======
+const serializeForClipboard = (pv as any).__serializeForClipboard;
+// code based on https://github.com/ueberdosis/tiptap/issues/323#issuecomment-506637799
+
+// let dragImageElement: Element | undefined;
+>>>>>>> mine
 
 export type SideMenuState<
   BSchema extends BlockSchema,
@@ -120,40 +137,41 @@ function blockPositionsFromSelection(selection: Selection, doc: Node) {
   return { from: beforeFirstBlockPos, to: afterLastBlockPos };
 }
 
-function setDragImage(view: EditorView, from: number, to = from) {
-  if (from === to) {
-    // Moves to position to be just after the first (and only) selected block.
-    to += view.state.doc.resolve(from + 1).node().nodeSize;
-  }
+// function setDragImage(view: EditorView, from: number, to = from) {
+//   if (from === to) {
+//     // Moves to position to be just after the first (and only) selected block.
+//     to += view.state.doc.resolve(from + 1).node().nodeSize;
+//   }
 
-  // Parent element is cloned to remove all unselected children without affecting the editor content.
-  const parentClone = view.domAtPos(from).node.cloneNode(true) as Element;
-  const parent = view.domAtPos(from).node as Element;
+//   // Parent element is cloned to remove all unselected children without affecting the editor content.
+//   const parentClone = view.domAtPos(from).node.cloneNode(true) as Element;
+//   const parent = view.domAtPos(from).node as Element;
 
-  const getElementIndex = (parentElement: Element, targetElement: Element) =>
-    Array.prototype.indexOf.call(parentElement.children, targetElement);
+//   const getElementIndex = (parentElement: Element, targetElement: Element) =>
+//     Array.prototype.indexOf.call(parentElement.children, targetElement);
 
-  const firstSelectedBlockIndex = getElementIndex(
-    parent,
-    // Expects from position to be just before the first selected block.
-    view.domAtPos(from + 1).node.parentElement!
-  );
-  const lastSelectedBlockIndex = getElementIndex(
-    parent,
-    // Expects to position to be just after the last selected block.
-    view.domAtPos(to - 1).node.parentElement!
-  );
+//   const firstSelectedBlockIndex = getElementIndex(
+//     parent,
+//     // Expects from position to be just before the first selected block.
+//     view.domAtPos(from + 1).node.parentElement!
+//   );
+//   const lastSelectedBlockIndex = getElementIndex(
+//     parent,
+//     // Expects to position to be just after the last selected block.
+//     view.domAtPos(to - 1).node.parentElement!
+//   );
 
-  for (let i = parent.childElementCount - 1; i >= 0; i--) {
-    if (i > lastSelectedBlockIndex || i < firstSelectedBlockIndex) {
-      parentClone.removeChild(parentClone.children[i]);
-    }
-  }
+//   for (let i = parent.childElementCount - 1; i >= 0; i--) {
+//     if (i > lastSelectedBlockIndex || i < firstSelectedBlockIndex) {
+//       parentClone.removeChild(parentClone.children[i]);
+//     }
+//   }
 
-  // dataTransfer.setDragImage(element) only works if element is attached to the DOM.
-  unsetDragImage();
-  dragImageElement = parentClone;
+//   // dataTransfer.setDragImage(element) only works if element is attached to the DOM.
+//   unsetDragImage();
+//   dragImageElement = parentClone;
 
+<<<<<<< HEAD
   // TODO: This is hacky, need a better way of assigning classes to the editor so that they can also be applied to the
   //  drag preview.
   const classes = view.dom.className.split(" ");
@@ -168,15 +186,35 @@ function setDragImage(view: EditorView, from: number, to = from) {
 
   dragImageElement.className =
     dragImageElement.className + " bn-drag-preview " + inheritedClasses;
+=======
+//   // TODO: This is hacky, need a better way of assigning classes to the editor so that they can also be applied to the
+//   //  drag preview.
+//   const classes = view.dom.className.split(" ");
+//   const inheritedClasses = classes
+//     .filter(
+//       (className) =>
+//         !className.includes("bn") &&
+//         !className.includes("ProseMirror") &&
+//         !className.includes("editor")
+//     )
+//     .join(" ");
 
-  document.body.appendChild(dragImageElement);
-}
+//   dragImageElement.className =
+//     dragImageElement.className +
+//     " " +
+//     styles.dragPreview +
+//     " " +
+//     inheritedClasses;
+>>>>>>> mine
+
+//   document.body.appendChild(dragImageElement);
+// }
 
 function unsetDragImage() {
-  if (dragImageElement !== undefined) {
-    document.body.removeChild(dragImageElement);
-    dragImageElement = undefined;
-  }
+  // if (dragImageElement !== undefined) {
+  //   document.body.removeChild(dragImageElement);
+  //   dragImageElement = undefined;
+  // }
 }
 
 function dragStart<
@@ -216,12 +254,12 @@ function dragStart<
       view.dispatch(
         view.state.tr.setSelection(MultipleNodeSelection.create(doc, from, to))
       );
-      setDragImage(view, from, to);
+      // setDragImage(view, from, to);
     } else {
       view.dispatch(
         view.state.tr.setSelection(NodeSelection.create(view.state.doc, pos))
       );
-      setDragImage(view, pos);
+      // setDragImage(view, pos);
     }
 
     const selectedSlice = view.state.selection.content();
@@ -244,8 +282,13 @@ function dragStart<
     e.dataTransfer.setData("text/html", externalHTML);
     e.dataTransfer.setData("text/plain", plainText);
     e.dataTransfer.effectAllowed = "move";
+<<<<<<< HEAD
     e.dataTransfer.setDragImage(dragImageElement!, 0, 0);
     view.dragging = { slice: selectedSlice, move: true };
+=======
+    // e.dataTransfer.setDragImage(dragImageElement!, 0, 0);
+    view.dragging = { slice, move: true };
+>>>>>>> mine
   }
 }
 
@@ -288,15 +331,22 @@ export class SideMenuView<
 
     // Shows or updates menu position whenever the cursor moves, if the menu isn't frozen.
     document.body.addEventListener("mousemove", this.onMouseMove, true);
+    document.body.addEventListener("mousedown", this.onMouseDown, true);
 
     // Makes menu scroll with the page.
-    document.addEventListener("scroll", this.onScroll);
+    setTimeout(() => {
+      findScrollContainer(pmView.dom).addEventListener("scroll", this.onScroll);
+    });
 
     // Unfreezes the menu whenever the user clicks anywhere.
     document.body.addEventListener("mousedown", this.onMouseDown, true);
     // Hides and unfreezes the menu whenever the user presses a key.
     document.body.addEventListener("keydown", this.onKeyDown, true);
   }
+
+  onMouseDown = () => {
+    this.menuFrozen = false;
+  };
 
   /**
    * Sets isDragging when dragging text.
@@ -405,7 +455,7 @@ export class SideMenuView<
       event.clientY >= editorOuterBoundingBox.top &&
       event.clientY <= editorOuterBoundingBox.bottom;
 
-    const editorWrapper = this.pmView.dom.parentElement!;
+    const editorWrapper = this.pmView.dom.parentElement?.parentElement;
 
     // Doesn't update if the mouse hovers an element that's over the editor but
     // isn't a part of it or the side menu.
@@ -417,8 +467,9 @@ export class SideMenuView<
       event.target &&
       // Element is outside the editor
       !(
-        editorWrapper === event.target ||
-        editorWrapper.contains(event.target as HTMLElement)
+        editorWrapper &&
+        (editorWrapper === event.target ||
+          editorWrapper.contains(event.target as HTMLElement))
       )
     ) {
       if (this.sideMenuState?.show) {
@@ -467,7 +518,11 @@ export class SideMenuView<
     }
 
     // Shows or updates elements.
-    if (this.editor.isEditable) {
+    if (
+      this.editor.isEditable &&
+      this.hoveredBlock &&
+      this.hoveredBlock.getAttribute("data-id")
+    ) {
       const blockContentBoundingBox = blockContent.getBoundingClientRect();
 
       this.sideMenuState = {
@@ -481,7 +536,7 @@ export class SideMenuView<
           blockContentBoundingBox.height
         ),
         block: this.editor.getBlock(
-          this.hoveredBlock!.getAttribute("data-id")!
+          this.hoveredBlock.getAttribute("data-id")!
         )!,
       };
 
@@ -490,8 +545,8 @@ export class SideMenuView<
   };
 
   onScroll = () => {
-    if (this.sideMenuState?.show) {
-      const blockContent = this.hoveredBlock!.firstChild as HTMLElement;
+    if (this.sideMenuState?.show && this.hoveredBlock) {
+      const blockContent = this.hoveredBlock.firstChild as HTMLElement;
       const blockContentBoundingBox = blockContent.getBoundingClientRect();
 
       this.sideMenuState.referencePos = new DOMRect(
@@ -512,6 +567,7 @@ export class SideMenuView<
       this.updateSideMenu(this.sideMenuState);
     }
     document.body.removeEventListener("mousemove", this.onMouseMove);
+    document.body.removeEventListener("mousedown", this.onMouseDown);
     document.body.removeEventListener("dragover", this.onDragOver);
     this.pmView.dom.removeEventListener("dragstart", this.onDragStart);
     document.body.removeEventListener("drop", this.onDrop, true);
@@ -547,7 +603,11 @@ export class SideMenuView<
       return;
     }
 
+<<<<<<< HEAD
     const { contentNode, startPos, endPos } = blockInfo;
+=======
+    const { contentNode, endPos, startPos } = blockInfo;
+>>>>>>> mine
 
     // Creates a new block if current one is not empty for the suggestion menu to open in.
     if (contentNode.textContent.length !== 0) {

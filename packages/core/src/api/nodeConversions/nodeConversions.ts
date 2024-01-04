@@ -53,6 +53,11 @@ function styledTextToNodes<T extends StyleSchema>(
       throw new UnreachableCaseError(config.propSchema);
     }
   }
+  if (styledText.attrs) {
+    for (const [type, value] of Object.entries(styledText.attrs)) {
+      marks.push(schema.mark(type, value));
+    }
+  }
 
   return (
     styledText.text
@@ -147,6 +152,25 @@ export function inlineContentToNodes<
       nodes.push(...linkToNodes(content, schema, styleSchema));
     } else if (isStyledTextInlineContent(content)) {
       nodes.push(...styledTextArrayToNodes([content], schema, styleSchema));
+    } else if(schema.nodes[(content as any).type]){
+      const children: Node[] = [];
+      const ctx = content as any;
+      if (ctx.content) {
+        if (typeof ctx.content === "string") {
+          children.push(schema.text(ctx.content));
+        } else {
+          children.push(...inlineContentToNodes(ctx.content, schema, styleSchema));
+        }
+      } else if (ctx.text) {
+        children.push(schema.text(ctx.text));
+      }
+
+      nodes.push(
+        schema.nodes[ctx.type].create(
+          ctx.attrs,
+          children.length ? children : undefined
+        )
+      );
     } else {
       nodes.push(
         blockOrInlineContentToContentNode(content, schema, styleSchema)
@@ -303,15 +327,41 @@ function contentNodeToTableContent<
 /**
  * Converts an internal (prosemirror) content node to a BlockNote InlineContent array.
  */
+<<<<<<< HEAD
 export function contentNodeToInlineContent<
   I extends InlineContentSchema,
   S extends StyleSchema
 >(contentNode: Node, inlineContentSchema: I, styleSchema: S) {
   const content: InlineContent<any, S>[] = [];
   let currentContent: InlineContent<any, S> | undefined = undefined;
+=======
+function contentNodeToInlineContent(contentNode: Node) {
+  const content: InlineContent[] = [];
+>>>>>>> mine
 
+  if (contentNode.type.name === "taskList") {
+    contentNode.content.forEach((node) => {
+      if (node.type.name === "taskItem") {
+        const innerContent: InlineContent[] = [];
+
+        // contentNodeToInlineContent
+        node.content.forEach((node) => {
+          innerContent.push(...contentNodeToInlineContent(node));
+        });
+        content.push({
+          type: "taskItem",
+          content: innerContent,
+          attrs: node.attrs,
+        } as any);
+      }
+    });
+    return content;
+  }
+
+  let currentContent: InlineContent | undefined = undefined;
   // Most of the logic below is for handling links because in ProseMirror links are marks
   // while in BlockNote links are a type of inline content
+
   contentNode.content.forEach((node) => {
     // hardBreak nodes do not have an InlineContent equivalent, instead we
     // add a newline to the previous node.
@@ -334,12 +384,14 @@ export function contentNodeToInlineContent<
           type: "text",
           text: "\n",
           styles: {},
+          attrs: {},
         };
       }
 
       return;
     }
 
+<<<<<<< HEAD
     if (
       node.type.name !== "link" &&
       node.type.name !== "text" &&
@@ -358,12 +410,17 @@ export function contentNodeToInlineContent<
     }
 
     const styles: Styles<S> = {};
+=======
+    const styles: Styles = {};
+    const extendAttrs: Record<string, any> = {};
+>>>>>>> mine
     let linkMark: Mark | undefined;
 
     for (const mark of node.marks) {
       if (mark.type.name === "link") {
         linkMark = mark;
       } else {
+<<<<<<< HEAD
         const config = styleSchema[mark.type.name];
         if (!config) {
           throw new Error(`style ${mark.type.name} not found in styleSchema`);
@@ -375,6 +432,9 @@ export function contentNodeToInlineContent<
         } else {
           throw new UnreachableCaseError(config.propSchema);
         }
+=======
+        extendAttrs[mark.type.name] = mark.attrs;
+>>>>>>> mine
       }
     }
 
@@ -382,6 +442,7 @@ export function contentNodeToInlineContent<
     // Current content exists.
     if (currentContent) {
       // Current content is text.
+<<<<<<< HEAD
       if (isStyledTextInlineContent(currentContent)) {
         if (!linkMark) {
           // Node is text (same type as current content).
@@ -400,6 +461,10 @@ export function contentNodeToInlineContent<
             };
           }
         } else {
+=======
+      if (currentContent.type === "text") {
+        if (linkMark) {
+>>>>>>> mine
           // Node is a link (different type to current content).
           content.push(currentContent);
           currentContent = {
@@ -410,8 +475,35 @@ export function contentNodeToInlineContent<
                 type: "text",
                 text: node.textContent,
                 styles,
+                attrs: extendAttrs,
               },
             ],
+          };
+        } else if (node.type.name === "text") {
+          // Node is text (same type as current content).
+          if (
+            JSON.stringify(currentContent.styles) === JSON.stringify(styles) &&
+            JSON.stringify(currentContent.attrs) === JSON.stringify(extendAttrs)
+          ) {
+            // Styles are the same.
+            currentContent.text += node.textContent;
+          } else {
+            // Styles are different.
+            content.push(currentContent);
+            currentContent = {
+              type: "text",
+              text: node.textContent,
+              styles,
+              attrs: extendAttrs,
+            };
+          }
+        } else {
+          content.push(currentContent);
+          currentContent = {
+            type: node.type.name as any,
+            text: node.textContent,
+            styles,
+            attrs: { ...extendAttrs, ...node.attrs },
           };
         }
       } else if (isLinkInlineContent(currentContent)) {
@@ -434,6 +526,7 @@ export function contentNodeToInlineContent<
                 type: "text",
                 text: node.textContent,
                 styles,
+                attrs: extendAttrs,
               });
             }
           } else {
@@ -447,6 +540,7 @@ export function contentNodeToInlineContent<
                   type: "text",
                   text: node.textContent,
                   styles,
+                  attrs: extendAttrs,
                 },
               ],
             };
@@ -458,6 +552,40 @@ export function contentNodeToInlineContent<
             type: "text",
             text: node.textContent,
             styles,
+            attrs: extendAttrs,
+          };
+        }
+      } else {
+        if (linkMark) {
+          currentContent = {
+            type: "link",
+            href: linkMark.attrs.href,
+            content: [
+              {
+                type: "text",
+                text: node.textContent,
+                styles,
+                attrs: extendAttrs,
+              },
+            ],
+          };
+        } else if (node.type.name === "text") {
+          content.push(currentContent);
+          currentContent = {
+            type: "text",
+            text: node.textContent,
+            styles,
+            attrs: extendAttrs,
+          };
+        } else {
+          content.push(currentContent);
+
+          currentContent = {
+            type: node.type.name as any,
+            text: node.textContent,
+            styles,
+            content: contentNodeToInlineContent(node) as any,
+            attrs: { ...extendAttrs, ...node.attrs },
           };
         }
       } else {
@@ -467,15 +595,7 @@ export function contentNodeToInlineContent<
     // Current content does not exist.
     else {
       // Node is text.
-      if (!linkMark) {
-        currentContent = {
-          type: "text",
-          text: node.textContent,
-          styles,
-        };
-      }
-      // Node is a link.
-      else {
+      if (linkMark) {
         currentContent = {
           type: "link",
           href: linkMark.attrs.href,
@@ -484,9 +604,28 @@ export function contentNodeToInlineContent<
               type: "text",
               text: node.textContent,
               styles,
+              attrs: extendAttrs,
             },
           ],
         };
+      }
+      // Node is a link.
+      else if (node.type.name === "text") {
+        currentContent = {
+          type: "text",
+          text: node.textContent,
+          styles,
+          attrs: extendAttrs,
+        };
+      } else {
+        content.push({
+          type: node.type.name as any,
+          text: node.textContent,
+          styles,
+          content: contentNodeToInlineContent(node) as any,
+
+          attrs: { ...extendAttrs, ...node.attrs },
+        });
       }
     }
   });
@@ -579,6 +718,7 @@ export function nodeToBlock<
   }
 
   const props: any = {};
+<<<<<<< HEAD
   for (const [attr, value] of Object.entries({
     ...node.attrs,
     ...blockInfo.contentNode.attrs,
@@ -589,11 +729,41 @@ export function nodeToBlock<
       throw Error(
         "Block is of an unrecognized type: " + blockInfo.contentType.name
       );
+=======
+
+  const blockSpec = blockSchema[blockInfo.contentType.name];
+  if (blockSpec) {
+    for (const [attr, value] of Object.entries({
+      ...node.attrs,
+      ...blockInfo.contentNode.attrs,
+    })) {
+      if (!blockSpec) {
+        throw Error(
+          "Block is of an unrecognized type: " + blockInfo.contentType.name
+        );
+      }
+
+      const propSchema = blockSpec.propSchema;
+
+      if (attr in propSchema) {
+        props[attr] = value;
+      }
+      // Block ids are stored as node attributes the same way props are, so we
+      // need to ensure we don't attempt to read block ids as props.
+
+      // the second check is for the backgroundColor & textColor props.
+      // Since we want them to be inherited by child blocks, we can't put them on the blockContent node,
+      // and instead have to put them on the blockContainer node.
+      // The blockContainer node is the same for all block types, but some custom blocks might not use backgroundColor & textColor,
+      // so these 2 props are technically unexpected but we shouldn't log a warning.
+      // (this is a bit hacky)
+      else if (attr !== "id" && !(attr in defaultProps)) {
+        console.warn("Block has an unrecognized attribute: " + attr);
+      }
+>>>>>>> mine
     }
-
-    const propSchema = blockSpec.propSchema;
-
-    if (attr in propSchema) {
+  } else {
+    for (const [attr, value] of Object.entries(blockInfo.contentNode.attrs)) {
       props[attr] = value;
     }
   }

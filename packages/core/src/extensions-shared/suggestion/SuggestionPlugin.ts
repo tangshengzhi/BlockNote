@@ -5,6 +5,8 @@ import type { BlockNoteEditor } from "../../editor/BlockNoteEditor";
 import { BlockSchema, InlineContentSchema, StyleSchema } from "../../schema";
 import { BaseUiElementState } from "../BaseUiElementTypes";
 import { SuggestionItem } from "./SuggestionItem";
+import { findScrollContainer } from "../../..";
+import { isActive } from "@tiptap/core";
 
 const findBlock = findParentNode((node) => node.type.name === "blockContainer");
 
@@ -46,7 +48,12 @@ class SuggestionsMenuView<
       updateSuggestionsMenu(this.suggestionsMenuState);
     };
 
-    document.addEventListener("scroll", this.handleScroll);
+    setTimeout(() => {
+      findScrollContainer(editor.domElement).addEventListener(
+        "scroll",
+        this.handleScroll
+      );
+    });
   }
 
   handleScroll = () => {
@@ -301,13 +308,20 @@ export const setupSuggestionsMenu = <
       props: {
         handleKeyDown(view, event) {
           const menuIsActive = (this as Plugin).getState(view.state).active;
-
           // Shows the menu if the default trigger character was pressed and the menu isn't active.
           if (event.key === defaultTriggerCharacter && !menuIsActive) {
+            if (
+              isActive(view.state, "codeBlock") ||
+              isActive(view.state, "code") ||
+              isActive(view.state, "Table")
+            ) {
+              return false;
+            }
+
             view.dispatch(
               view.state.tr
                 .insertText(defaultTriggerCharacter)
-                .scrollIntoView()
+                // .scrollIntoView()
                 .setMeta(pluginKey, {
                   activate: true,
                   triggerCharacter: defaultTriggerCharacter,

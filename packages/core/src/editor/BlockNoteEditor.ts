@@ -199,6 +199,7 @@ const blockNoteTipTapOptions = {
 
 export class BlockNoteEditor<
   BSchema extends BlockSchema = DefaultBlockSchema,
+<<<<<<< HEAD:packages/core/src/editor/BlockNoteEditor.ts
   ISchema extends InlineContentSchema = DefaultInlineContentSchema,
   SSchema extends StyleSchema = DefaultStyleSchema
 > {
@@ -212,6 +213,13 @@ export class BlockNoteEditor<
   public readonly inlineContentImplementations: InlineContentSpecs;
   public readonly styleImplementations: StyleSpecs;
 
+=======
+  TEditor extends TiptapEditor = TiptapEditor
+> {
+  public readonly _tiptapEditor: TEditor & { contentComponent: any };
+  public blockCache = new WeakMap<Node, Block<BSchema>>();
+  public readonly schema: BSchema;
+>>>>>>> mine:packages/core/src/BlockNoteEditor.ts
   public ready = false;
 
   public readonly sideMenu: SideMenuProsemirrorPlugin<
@@ -449,7 +457,7 @@ export class BlockNoteEditor<
       tiptapOptions.element = newOptions.parentElement;
     }
 
-    this._tiptapEditor = new Editor(tiptapOptions) as Editor & {
+    this._tiptapEditor = this.createEditor(tiptapOptions) as TEditor & {
       contentComponent: any;
     };
   }
@@ -492,6 +500,10 @@ export class BlockNoteEditor<
     });
 
     return blocks;
+  }
+
+  protected createEditor(tiptapOptions: EditorOptions): TEditor {
+    return new Editor(tiptapOptions) as TEditor;
   }
 
   /**
@@ -776,7 +788,16 @@ export class BlockNoteEditor<
     referenceBlock: BlockIdentifier,
     placement: "before" | "after" | "nested" = "before"
   ) {
+<<<<<<< HEAD:packages/core/src/editor/BlockNoteEditor.ts
     return insertBlocks(blocksToInsert, referenceBlock, placement, this);
+=======
+    return insertBlocks(
+      blocksToInsert,
+      referenceBlock,
+      placement,
+      this._tiptapEditor
+    );
+>>>>>>> mine:packages/core/src/BlockNoteEditor.ts
   }
 
   /**
@@ -812,7 +833,11 @@ export class BlockNoteEditor<
     blocksToRemove: BlockIdentifier[],
     blocksToInsert: PartialBlock<BSchema, ISchema, SSchema>[]
   ) {
+<<<<<<< HEAD:packages/core/src/editor/BlockNoteEditor.ts
     return replaceBlocks(blocksToRemove, blocksToInsert, this);
+=======
+    return replaceBlocks(blocksToRemove, blocksToInsert, this._tiptapEditor);
+>>>>>>> mine:packages/core/src/BlockNoteEditor.ts
   }
 
   /**

@@ -6,12 +6,29 @@ import type { BlockNoteEditor } from "../../editor/BlockNoteEditor";
 import { BaseUiElementState } from "../../extensions-shared/BaseUiElementTypes";
 import { BlockSchema, InlineContentSchema, StyleSchema } from "../../schema";
 import { EventEmitter } from "../../util/EventEmitter";
+import { findScrollContainer } from "../..";
 
 export type HyperlinkToolbarState = BaseUiElementState & {
   // The hovered hyperlink's URL, and the text it's displayed with in the
   // editor.
   url: string;
   text: string;
+};
+
+export const composePath = (
+  el: HTMLElement,
+  unit = (el: HTMLElement) => el.tagName === "html"
+) => {
+  const path = [] as HTMLElement[];
+  while (el) {
+    path.push(el);
+
+    if (unit(el) || !el.parentElement) {
+      return path;
+    }
+    el = el.parentElement;
+  }
+  return path;
 };
 
 class HyperlinkToolbarView {
@@ -49,7 +66,7 @@ class HyperlinkToolbarView {
     this.startMenuUpdateTimer = () => {
       this.menuUpdateTimer = setTimeout(() => {
         this.update();
-      }, 250);
+      }, 500);
     };
 
     this.stopMenuUpdateTimer = () => {
@@ -63,7 +80,12 @@ class HyperlinkToolbarView {
 
     this.pmView.dom.addEventListener("mouseover", this.mouseOverHandler);
     document.addEventListener("click", this.clickHandler, true);
-    document.addEventListener("scroll", this.scrollHandler);
+    setTimeout(() => {
+      findScrollContainer(pmView.dom).addEventListener(
+        "scroll",
+        this.scrollHandler
+      );
+    });
   }
 
   mouseOverHandler = (event: MouseEvent) => {
@@ -72,14 +94,16 @@ class HyperlinkToolbarView {
     this.mouseHoveredHyperlinkMarkRange = undefined;
 
     this.stopMenuUpdateTimer();
+    const path = composePath(
+      event.target as HTMLElement,
+      (el) => el.dataset.nodeType === "blockContainer" || el.nodeName === "HTML"
+    );
+    const target = path.find((el) => el.nodeName === "A");
 
-    if (
-      event.target instanceof HTMLAnchorElement &&
-      event.target.nodeName === "A"
-    ) {
+    if (target?.nodeName === "A") {
       // Finds link mark at the hovered element's position to update mouseHoveredHyperlinkMark and
       // mouseHoveredHyperlinkMarkRange.
-      const hoveredHyperlinkElement = event.target;
+      const hoveredHyperlinkElement = target;
       const posInHoveredHyperlinkMark =
         this.pmView.posAtDOM(hoveredHyperlinkElement, 0) + 1;
       const resolvedPosInHoveredHyperlinkMark = this.pmView.state.doc.resolve(
@@ -110,7 +134,7 @@ class HyperlinkToolbarView {
   };
 
   clickHandler = (event: MouseEvent) => {
-    const editorWrapper = this.pmView.dom.parentElement!;
+    const editorWrapper = this.pmView.dom.parentElement!.parentElement!;
 
     if (
       // Toolbar is open.
@@ -145,17 +169,21 @@ class HyperlinkToolbarView {
   };
 
   editHyperlink(url: string, text: string) {
-    const tr = this.pmView.state.tr.insertText(
-      text,
-      this.hyperlinkMarkRange!.from,
-      this.hyperlinkMarkRange!.to
-    );
-    tr.addMark(
-      this.hyperlinkMarkRange!.from,
-      this.hyperlinkMarkRange!.from + text.length,
-      this.pmView.state.schema.mark("link", { href: url })
-    );
+    const tr = this.pmView.state.tr
+      .insertText(
+        text,
+        this.hyperlinkMarkRange!.from,
+        this.hyperlinkMarkRange!.to
+      )
+      .addMark(
+        this.hyperlinkMarkRange!.from,
+        this.hyperlinkMarkRange!.from + text.length,
+        this.pmView.state.schema.mark("link", { href: url })
+      )
+      .setMeta("preventAutolink", true);
+
     this.pmView.dispatch(tr);
+
     this.pmView.focus();
 
     if (this.hyperlinkToolbarState?.show) {
@@ -183,7 +211,7 @@ class HyperlinkToolbarView {
   }
 
   update() {
-    if (!this.pmView.hasFocus()) {
+    if (!this.pmView.hasFocus() && this.hyperlinkToolbarState?.show === true) {
       return;
     }
 
@@ -200,25 +228,25 @@ class HyperlinkToolbarView {
 
     // Finds link mark at the editor selection's position to update keyboardHoveredHyperlinkMark and
     // keyboardHoveredHyperlinkMarkRange.
-    if (this.pmView.state.selection.empty) {
-      const marksAtPos = this.pmView.state.selection.$from.marks();
+    // if (this.pmView.state.selection.empty) {
+    //   const marksAtPos = this.pmView.state.selection.$from.marks();
 
-      for (const mark of marksAtPos) {
-        if (
-          mark.type.name === this.pmView.state.schema.mark("link").type.name
-        ) {
-          this.keyboardHoveredHyperlinkMark = mark;
-          this.keyboardHoveredHyperlinkMarkRange =
-            getMarkRange(
-              this.pmView.state.selection.$from,
-              mark.type,
-              mark.attrs
-            ) || undefined;
+    //   for (const mark of marksAtPos) {
+    //     if (
+    //       mark.type.name === this.pmView.state.schema.mark("link").type.name
+    //     ) {
+    //       this.keyboardHoveredHyperlinkMark = mark;
+    //       this.keyboardHoveredHyperlinkMarkRange =
+    //         getMarkRange(
+    //           this.pmView.state.selection.$from,
+    //           mark.type,
+    //           mark.attrs
+    //         ) || undefined;
 
-          break;
-        }
-      }
-    }
+    //       break;
+    //     }
+    //   }
+    // }
 
     if (this.mouseHoveredHyperlinkMark) {
       this.hyperlinkMark = this.mouseHoveredHyperlinkMark;

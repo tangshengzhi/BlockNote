@@ -10,6 +10,7 @@ export * from "./editor/selectionTypes";
 export * from "./extensions-shared/BaseUiElementTypes";
 export type { SuggestionItem } from "./extensions-shared/suggestion/SuggestionItem";
 export * from "./extensions-shared/suggestion/SuggestionPlugin";
+export * from "./api/getBlockInfoFromPos";
 export * from "./extensions/FormattingToolbar/FormattingToolbarPlugin";
 export * from "./extensions/HyperlinkToolbar/HyperlinkToolbarPlugin";
 export * from "./extensions/ImageToolbar/ImageToolbarPlugin";
