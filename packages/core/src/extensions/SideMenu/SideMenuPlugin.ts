@@ -2,7 +2,6 @@ import { PluginView } from "@tiptap/pm/state";
 import { Node } from "prosemirror-model";
 import { NodeSelection, Plugin, PluginKey, Selection } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
-<<<<<<< HEAD
 import { createExternalHTMLExporter } from "../../api/exporters/html/externalHTMLExporter";
 import { createInternalHTMLSerializer } from "../../api/exporters/html/internalHTMLSerializer";
 import { cleanHTMLToMarkdown } from "../../api/exporters/markdown/markdownExporter";
@@ -16,26 +15,11 @@ import {
   StyleSchema,
 } from "../../schema";
 import { EventEmitter } from "../../util/EventEmitter";
-=======
-import { BlockNoteEditor } from "../../BlockNoteEditor";
-// import styles from "../../editor.module.css";
-import { BaseUiElementState } from "../../shared/BaseUiElementTypes";
-import { EventEmitter } from "../../shared/EventEmitter";
-import { Block, BlockSchema } from "../Blocks/api/blockTypes";
-import { getBlockInfoFromPos } from "../Blocks/helpers/getBlockInfoFromPos";
->>>>>>> mine
 import { slashMenuPluginKey } from "../SlashMenu/SlashMenuPlugin";
 import { MultipleNodeSelection } from "./MultipleNodeSelection";
 import { findScrollContainer } from "../..";
 
-<<<<<<< HEAD
 let dragImageElement: Element | undefined;
-=======
-const serializeForClipboard = (pv as any).__serializeForClipboard;
-// code based on https://github.com/ueberdosis/tiptap/issues/323#issuecomment-506637799
-
-// let dragImageElement: Element | undefined;
->>>>>>> mine
 
 export type SideMenuState<
   BSchema extends BlockSchema,
@@ -171,7 +155,6 @@ function blockPositionsFromSelection(selection: Selection, doc: Node) {
 //   unsetDragImage();
 //   dragImageElement = parentClone;
 
-<<<<<<< HEAD
   // TODO: This is hacky, need a better way of assigning classes to the editor so that they can also be applied to the
   //  drag preview.
   const classes = view.dom.className.split(" ");
@@ -186,26 +169,6 @@ function blockPositionsFromSelection(selection: Selection, doc: Node) {
 
   dragImageElement.className =
     dragImageElement.className + " bn-drag-preview " + inheritedClasses;
-=======
-//   // TODO: This is hacky, need a better way of assigning classes to the editor so that they can also be applied to the
-//   //  drag preview.
-//   const classes = view.dom.className.split(" ");
-//   const inheritedClasses = classes
-//     .filter(
-//       (className) =>
-//         !className.includes("bn") &&
-//         !className.includes("ProseMirror") &&
-//         !className.includes("editor")
-//     )
-//     .join(" ");
-
-//   dragImageElement.className =
-//     dragImageElement.className +
-//     " " +
-//     styles.dragPreview +
-//     " " +
-//     inheritedClasses;
->>>>>>> mine
 
 //   document.body.appendChild(dragImageElement);
 // }
@@ -282,13 +245,9 @@ function dragStart<
     e.dataTransfer.setData("text/html", externalHTML);
     e.dataTransfer.setData("text/plain", plainText);
     e.dataTransfer.effectAllowed = "move";
-<<<<<<< HEAD
+    // 注释掉了，为啥
     e.dataTransfer.setDragImage(dragImageElement!, 0, 0);
     view.dragging = { slice: selectedSlice, move: true };
-=======
-    // e.dataTransfer.setDragImage(dragImageElement!, 0, 0);
-    view.dragging = { slice, move: true };
->>>>>>> mine
   }
 }
 
@@ -603,11 +562,7 @@ export class SideMenuView<
       return;
     }
 
-<<<<<<< HEAD
     const { contentNode, startPos, endPos } = blockInfo;
-=======
-    const { contentNode, endPos, startPos } = blockInfo;
->>>>>>> mine
 
     // Creates a new block if current one is not empty for the suggestion menu to open in.
     if (contentNode.textContent.length !== 0) {

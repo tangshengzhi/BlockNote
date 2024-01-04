@@ -6,18 +6,10 @@ import type { BlockNoteEditor } from "../../editor/BlockNoteEditor";
 import {
   BaseUiElementCallbacks,
   BaseUiElementState,
-<<<<<<< HEAD
 } from "../../extensions-shared/BaseUiElementTypes";
 import { BlockSchema, InlineContentSchema, StyleSchema } from "../../schema";
 import { EventEmitter } from "../../util/EventEmitter";
-=======
-  BlockNoteEditor,
-  BlockSchema,
-  findScrollContainer,
-} from "../..";
-import { EventEmitter } from "../../shared/EventEmitter";
->>>>>>> mine
-
+import { findScrollContainer } from '../..'
 export type FormattingToolbarCallbacks = BaseUiElementCallbacks;
 
 export type FormattingToolbarState = BaseUiElementState;

@@ -19,6 +19,7 @@ import type {
   Styles,
   TableContent,
 } from "../../schema";
+import { defaultProps } from "../../extensions/Blocks/api/defaultBlocks";
 import { getBlockInfo } from "../getBlockInfoFromPos";
 
 import {
@@ -327,26 +328,21 @@ function contentNodeToTableContent<
 /**
  * Converts an internal (prosemirror) content node to a BlockNote InlineContent array.
  */
-<<<<<<< HEAD
 export function contentNodeToInlineContent<
   I extends InlineContentSchema,
   S extends StyleSchema
 >(contentNode: Node, inlineContentSchema: I, styleSchema: S) {
   const content: InlineContent<any, S>[] = [];
   let currentContent: InlineContent<any, S> | undefined = undefined;
-=======
-function contentNodeToInlineContent(contentNode: Node) {
-  const content: InlineContent[] = [];
->>>>>>> mine
 
   if (contentNode.type.name === "taskList") {
     contentNode.content.forEach((node) => {
       if (node.type.name === "taskItem") {
-        const innerContent: InlineContent[] = [];
+        const innerContent: InlineContent<any, S>[] = [];
 
         // contentNodeToInlineContent
         node.content.forEach((node) => {
-          innerContent.push(...contentNodeToInlineContent(node));
+          innerContent.push(...contentNodeToInlineContent(node, inlineContentSchema, styleSchema));
         });
         content.push({
           type: "taskItem",
@@ -358,7 +354,6 @@ function contentNodeToInlineContent(contentNode: Node) {
     return content;
   }
 
-  let currentContent: InlineContent | undefined = undefined;
   // Most of the logic below is for handling links because in ProseMirror links are marks
   // while in BlockNote links are a type of inline content
 
@@ -391,7 +386,6 @@ function contentNodeToInlineContent(contentNode: Node) {
       return;
     }
 
-<<<<<<< HEAD
     if (
       node.type.name !== "link" &&
       node.type.name !== "text" &&
@@ -410,17 +404,13 @@ function contentNodeToInlineContent(contentNode: Node) {
     }
 
     const styles: Styles<S> = {};
-=======
-    const styles: Styles = {};
     const extendAttrs: Record<string, any> = {};
->>>>>>> mine
     let linkMark: Mark | undefined;
 
     for (const mark of node.marks) {
       if (mark.type.name === "link") {
         linkMark = mark;
       } else {
-<<<<<<< HEAD
         const config = styleSchema[mark.type.name];
         if (!config) {
           throw new Error(`style ${mark.type.name} not found in styleSchema`);
@@ -432,9 +422,6 @@ function contentNodeToInlineContent(contentNode: Node) {
         } else {
           throw new UnreachableCaseError(config.propSchema);
         }
-=======
-        extendAttrs[mark.type.name] = mark.attrs;
->>>>>>> mine
       }
     }
 
@@ -442,7 +429,6 @@ function contentNodeToInlineContent(contentNode: Node) {
     // Current content exists.
     if (currentContent) {
       // Current content is text.
-<<<<<<< HEAD
       if (isStyledTextInlineContent(currentContent)) {
         if (!linkMark) {
           // Node is text (same type as current content).
@@ -461,10 +447,6 @@ function contentNodeToInlineContent(contentNode: Node) {
             };
           }
         } else {
-=======
-      if (currentContent.type === "text") {
-        if (linkMark) {
->>>>>>> mine
           // Node is a link (different type to current content).
           content.push(currentContent);
           currentContent = {
@@ -584,7 +566,7 @@ function contentNodeToInlineContent(contentNode: Node) {
             type: node.type.name as any,
             text: node.textContent,
             styles,
-            content: contentNodeToInlineContent(node) as any,
+            content: contentNodeToInlineContent(node, inlineContentSchema, styleSchema) as any,
             attrs: { ...extendAttrs, ...node.attrs },
           };
         }
@@ -622,7 +604,7 @@ function contentNodeToInlineContent(contentNode: Node) {
           type: node.type.name as any,
           text: node.textContent,
           styles,
-          content: contentNodeToInlineContent(node) as any,
+          content: contentNodeToInlineContent(node, inlineContentSchema, styleSchema) as any,
 
           attrs: { ...extendAttrs, ...node.attrs },
         });
@@ -718,18 +700,16 @@ export function nodeToBlock<
   }
 
   const props: any = {};
-<<<<<<< HEAD
-  for (const [attr, value] of Object.entries({
-    ...node.attrs,
-    ...blockInfo.contentNode.attrs,
-  })) {
-    const blockSpec = blockSchema[blockInfo.contentType.name];
+  // for (const [attr, value] of Object.entries({
+  //   ...node.attrs,
+  //   ...blockInfo.contentNode.attrs,
+  // })) {
+  //   const blockSpec = blockSchema[blockInfo.contentType.name];
 
-    if (!blockSpec) {
-      throw Error(
-        "Block is of an unrecognized type: " + blockInfo.contentType.name
-      );
-=======
+  //   if (!blockSpec) {
+  //     throw Error(
+  //       "Block is of an unrecognized type: " + blockInfo.contentType.name
+  //     );
 
   const blockSpec = blockSchema[blockInfo.contentType.name];
   if (blockSpec) {
@@ -760,7 +740,6 @@ export function nodeToBlock<
       else if (attr !== "id" && !(attr in defaultProps)) {
         console.warn("Block has an unrecognized attribute: " + attr);
       }
->>>>>>> mine
     }
   } else {
     for (const [attr, value] of Object.entries(blockInfo.contentNode.attrs)) {

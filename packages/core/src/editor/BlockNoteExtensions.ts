@@ -8,13 +8,7 @@ import { Dropcursor } from "@tiptap/extension-dropcursor";
 import { Gapcursor } from "@tiptap/extension-gapcursor";
 import { HardBreak } from "@tiptap/extension-hard-break";
 import { History } from "@tiptap/extension-history";
-<<<<<<< HEAD:packages/core/src/editor/BlockNoteExtensions.ts
 import { Link } from "@tiptap/extension-link";
-=======
-import { Italic } from "@tiptap/extension-italic";
-import { Link } from "./extensions/Link";
-import { Strike } from "@tiptap/extension-strike";
->>>>>>> mine:packages/core/src/BlockNoteExtensions.ts
 import { Text } from "@tiptap/extension-text";
 import * as Y from "yjs";
 import { createCopyToClipboardExtension } from "../api/exporters/copyExtension";
@@ -84,25 +78,16 @@ export const getBlockNoteExtensions = <
     Text,
 
     // marks:
-<<<<<<< HEAD:packages/core/src/editor/BlockNoteExtensions.ts
-    Link,
-    ...Object.values(opts.styleSpecs).map((styleSpec) => {
-      return styleSpec.implementation.mark;
-    }),
-
-=======
-    Bold,
-    Code,
-    Italic,
-    Strike,
-    Underline,
+    // Link,
     Link.configure({
       linkOnPaste: true,
       openOnClick: false,
       autolink: false,
     }),
-    TextColorMark,
->>>>>>> mine:packages/core/src/BlockNoteExtensions.ts
+    ...Object.values(opts.styleSpecs).map((styleSpec) => {
+      return styleSpec.implementation.mark;
+    }),
+    
     TextColorExtension,
 
     BackgroundColorExtension,

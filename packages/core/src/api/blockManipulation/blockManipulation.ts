@@ -21,29 +21,23 @@ export function insertBlocks<
   blocksToInsert: PartialBlock<BSchema, I, S>[],
   referenceBlock: BlockIdentifier,
   placement: "before" | "after" | "nested" = "before",
-<<<<<<< HEAD
   editor: BlockNoteEditor<BSchema, I, S>
 ): Block<BSchema, I, S>[] {
   const ttEditor = editor._tiptapEditor;
 
-=======
-  editor: Editor
-): (PartialBlock<BSchema> & { id: string })[] {
->>>>>>> mine
+//   editor: Editor
+// ): (PartialBlock<BSchema> & { id: string })[] {
   const id =
     typeof referenceBlock === "string" ? referenceBlock : referenceBlock.id;
 
   const nodesToInsert: Node[] = [];
   for (const blockSpec of blocksToInsert) {
-<<<<<<< HEAD
     nodesToInsert.push(
       blockToNode(blockSpec, ttEditor.schema, editor.styleSchema)
     );
-=======
-    const node = blockToNode(blockSpec, editor.schema);
-    nodesToInsert.push(node);
-    blockSpec.id = node.attrs.id;
->>>>>>> mine
+    // const node = blockToNode(blockSpec, editor.schema);
+    // nodesToInsert.push(node);
+    // blockSpec.id = node.attrs.id;
   }
 
   const { node, posBeforeNode } = getNodeById(id, ttEditor.state.doc);
@@ -74,15 +68,10 @@ export function insertBlocks<
           blockGroupNode
         )
       );
-<<<<<<< HEAD
-=======
-
-      return blocksToInsert as (PartialBlock<BSchema> & { id: string })[];
->>>>>>> mine
     }
+    // return blocksToInsert as (PartialBlock<BSchema> & { id: string })[];
   }
 
-<<<<<<< HEAD
   // Now that the `PartialBlock`s have been converted to nodes, we can
   // re-convert them into full `Block`s.
   const insertedBlocks: Block<BSchema, I, S>[] = [];
@@ -97,13 +86,10 @@ export function insertBlocks<
       )
     );
   }
+  // editor.view.dispatch(editor.state.tr.insert(insertionPos, nodesToInsert));
 
+  // return blocksToInsert as (PartialBlock<BSchema> & { id: string })[]
   return insertedBlocks;
-=======
-  editor.view.dispatch(editor.state.tr.insert(insertionPos, nodesToInsert));
-
-  return blocksToInsert as (PartialBlock<BSchema> & { id: string })[];
->>>>>>> mine
 }
 
 export function updateBlock<
@@ -219,7 +205,6 @@ export function removeBlocks<
   S extends StyleSchema
 >(
   blocksToRemove: BlockIdentifier[],
-<<<<<<< HEAD
   editor: BlockNoteEditor<BSchema, I, S>
 ): Block<BSchema, I, S>[] {
   return removeBlocksWithCallback(blocksToRemove, editor);
@@ -280,17 +265,4 @@ export function replaceBlocks<
   }
 
   return { insertedBlocks, removedBlocks };
-=======
-  blocksToInsert: PartialBlock<BSchema>[],
-  editor: Editor
-) {
-  const blocks = insertBlocks(
-    blocksToInsert,
-    blocksToRemove[0],
-    "before",
-    editor
-  );
-  removeBlocks(blocksToRemove, editor);
-  return blocks;
->>>>>>> mine
 }

@@ -199,7 +199,7 @@ const blockNoteTipTapOptions = {
 
 export class BlockNoteEditor<
   BSchema extends BlockSchema = DefaultBlockSchema,
-<<<<<<< HEAD:packages/core/src/editor/BlockNoteEditor.ts
+  TEditor extends TiptapEditor = TiptapEditor,
   ISchema extends InlineContentSchema = DefaultInlineContentSchema,
   SSchema extends StyleSchema = DefaultStyleSchema
 > {
@@ -213,13 +213,7 @@ export class BlockNoteEditor<
   public readonly inlineContentImplementations: InlineContentSpecs;
   public readonly styleImplementations: StyleSpecs;
 
-=======
-  TEditor extends TiptapEditor = TiptapEditor
-> {
-  public readonly _tiptapEditor: TEditor & { contentComponent: any };
-  public blockCache = new WeakMap<Node, Block<BSchema>>();
-  public readonly schema: BSchema;
->>>>>>> mine:packages/core/src/BlockNoteEditor.ts
+  // public readonly _tiptapEditor: TEditor & { contentComponent: any };
   public ready = false;
 
   public readonly sideMenu: SideMenuProsemirrorPlugin<
@@ -788,16 +782,13 @@ export class BlockNoteEditor<
     referenceBlock: BlockIdentifier,
     placement: "before" | "after" | "nested" = "before"
   ) {
-<<<<<<< HEAD:packages/core/src/editor/BlockNoteEditor.ts
     return insertBlocks(blocksToInsert, referenceBlock, placement, this);
-=======
-    return insertBlocks(
-      blocksToInsert,
-      referenceBlock,
-      placement,
-      this._tiptapEditor
-    );
->>>>>>> mine:packages/core/src/BlockNoteEditor.ts
+    // return insertBlocks(
+    //   blocksToInsert,
+    //   referenceBlock,
+    //   placement,
+    //   this._tiptapEditor
+    // );
   }
 
   /**
@@ -833,11 +824,8 @@ export class BlockNoteEditor<
     blocksToRemove: BlockIdentifier[],
     blocksToInsert: PartialBlock<BSchema, ISchema, SSchema>[]
   ) {
-<<<<<<< HEAD:packages/core/src/editor/BlockNoteEditor.ts
     return replaceBlocks(blocksToRemove, blocksToInsert, this);
-=======
-    return replaceBlocks(blocksToRemove, blocksToInsert, this._tiptapEditor);
->>>>>>> mine:packages/core/src/BlockNoteEditor.ts
+    // return replaceBlocks(blocksToRemove, blocksToInsert, this._tiptapEditor);
   }
 
   /**

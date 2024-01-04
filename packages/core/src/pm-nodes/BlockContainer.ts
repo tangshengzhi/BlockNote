@@ -6,17 +6,11 @@ import { getBlockInfoFromPos } from "../api/getBlockInfoFromPos";
 import {
   blockToNode,
   inlineContentToNodes,
-<<<<<<< HEAD:packages/core/src/pm-nodes/BlockContainer.ts
   tableContentToNodes,
 } from "../api/nodeConversions/nodeConversions";
 import type { BlockNoteEditor } from "../editor/BlockNoteEditor";
 import { NonEditableBlockPlugin } from "../extensions/NonEditableBlocks/NonEditableBlockPlugin";
 import { PreviousBlockTypePlugin } from "../extensions/PreviousBlockType/PreviousBlockTypePlugin";
-=======
-} from "../../../api/nodeConversions/nodeConversions";
-import { isInTable } from "prosemirror-tables";
-
->>>>>>> mine:packages/core/src/extensions/Blocks/nodes/BlockContainer.ts
 import {
   BlockNoteDOMAttributes,
   BlockSchema,
@@ -24,6 +18,7 @@ import {
   PartialBlock,
   StyleSchema,
 } from "../schema";
+import { isInTable } from "prosemirror-tables";
 import { mergeCSSClasses } from "../util/browser";
 import { UnreachableCaseError } from "../util/typescript";
 
@@ -498,14 +493,10 @@ export const BlockContainer = Node.create<{
         // Reverts block content type to a paragraph if the selection is at the start of the block.
         () =>
           commands.command(({ state }) => {
-<<<<<<< HEAD:packages/core/src/pm-nodes/BlockContainer.ts
-            const { contentType, startPos } = getBlockInfoFromPos(
-=======
             if (isInTable(state)) {
               return false;
             }
-            const { contentType, contentNode } = getBlockInfoFromPos(
->>>>>>> mine:packages/core/src/extensions/Blocks/nodes/BlockContainer.ts
+            const { contentType, contentNode, startPos } = getBlockInfoFromPos(
               state.doc,
               state.selection.from
             )!;
@@ -529,20 +520,15 @@ export const BlockContainer = Node.create<{
         // Removes a level of nesting if the block is indented if the selection is at the start of the block.
         () =>
           commands.command(({ state }) => {
-<<<<<<< HEAD:packages/core/src/pm-nodes/BlockContainer.ts
+            if (isInTable(state)) {
+              return false;
+            }
             const { startPos } = getBlockInfoFromPos(
               state.doc,
               state.selection.from
             )!;
 
             const selectionAtBlockStart = state.selection.from === startPos + 1;
-=======
-            if (isInTable(state)) {
-              return false;
-            }
-            const selectionAtBlockStart =
-              state.selection.$anchor.parentOffset === 0;
->>>>>>> mine:packages/core/src/extensions/Blocks/nodes/BlockContainer.ts
 
             if (selectionAtBlockStart) {
               return commands.liftListItem("blockContainer");
@@ -581,52 +567,49 @@ export const BlockContainer = Node.create<{
           }),
       ]);
 
+    // const handleDelete = () =>
+    //   this.editor.commands.first(({ commands }) => [
+    //     // Deletes the selection if it's not empty.
+    //     () => commands.deleteSelection(),
+    //     // Merges block with the next one (at the same nesting level or lower),
+    //     // if one exists, the block has no children, and the selection is at the
+    //     // end of the block.
+    //     () =>
+    //       commands.command(({ state }) => {
+    //         const { node, depth, endPos } = getBlockInfoFromPos(
+    //           state.doc,
+    //           state.selection.from
+    //         )!;
+
+    //         const blockAtDocEnd = endPos === state.doc.nodeSize - 4;
+    //         const selectionAtBlockEnd = state.selection.from === endPos - 1;
+    //         const selectionEmpty = state.selection.empty;
+    //         const hasChildBlocks = node.childCount === 2;
+
+    //         if (
+    //           !blockAtDocEnd &&
+    //           selectionAtBlockEnd &&
+    //           selectionEmpty &&
+    //           !hasChildBlocks
+    //         ) {
+    //           let oldDepth = depth;
+    //           let newPos = endPos + 2;
+    //           let newDepth = state.doc.resolve(newPos).depth;
+
+    //           while (newDepth < oldDepth) {
+    //             oldDepth = newDepth;
+    //             newPos += 2;
+    //             newDepth = state.doc.resolve(newPos).depth;
+    //           }
+
+    //           return commands.BNMergeBlocks(newPos - 1);
+    //         }
+
+    //         return false;
+    //       }),
+    //   ]);
+
     const handleDelete = () =>
-<<<<<<< HEAD:packages/core/src/pm-nodes/BlockContainer.ts
-      this.editor.commands.first(({ commands }) => [
-        // Deletes the selection if it's not empty.
-        () => commands.deleteSelection(),
-        // Merges block with the next one (at the same nesting level or lower),
-        // if one exists, the block has no children, and the selection is at the
-        // end of the block.
-        () =>
-          commands.command(({ state }) => {
-            const { node, depth, endPos } = getBlockInfoFromPos(
-              state.doc,
-              state.selection.from
-            )!;
-
-            const blockAtDocEnd = endPos === state.doc.nodeSize - 4;
-            const selectionAtBlockEnd = state.selection.from === endPos - 1;
-            const selectionEmpty = state.selection.empty;
-            const hasChildBlocks = node.childCount === 2;
-
-            if (
-              !blockAtDocEnd &&
-              selectionAtBlockEnd &&
-              selectionEmpty &&
-              !hasChildBlocks
-            ) {
-              let oldDepth = depth;
-              let newPos = endPos + 2;
-              let newDepth = state.doc.resolve(newPos).depth;
-
-              while (newDepth < oldDepth) {
-                oldDepth = newDepth;
-                newPos += 2;
-                newDepth = state.doc.resolve(newPos).depth;
-              }
-
-              return commands.BNMergeBlocks(newPos - 1);
-            }
-
-            return false;
-          }),
-      ]);
-
-    const handleEnter = () =>
-=======
->>>>>>> mine:packages/core/src/extensions/Blocks/nodes/BlockContainer.ts
       this.editor.commands.first(({ commands }) => [
         // Deletes the selection if it's not empty.
         () => commands.deleteSelection(),
@@ -689,6 +672,90 @@ export const BlockContainer = Node.create<{
             return false;
           }),
       ]);
+
+      // const handleEnter = () =>
+      //   this.editor.commands.first(({ commands }) => [
+      //     // Removes a level of nesting if the block is empty & indented, while the selection is also empty & at the start
+      //     // of the block.
+      //     () =>
+      //       commands.command(({ state }) => {
+      //         const { node, depth } = getBlockInfoFromPos(
+      //           state.doc,
+      //           state.selection.from
+      //         )!;
+
+      //         const selectionAtBlockStart =
+      //           state.selection.$anchor.parentOffset === 0;
+      //         const selectionEmpty =
+      //           state.selection.anchor === state.selection.head;
+      //         const blockEmpty = node.textContent.length === 0;
+      //         const blockIndented = depth > 2;
+
+      //         if (
+      //           selectionAtBlockStart &&
+      //           selectionEmpty &&
+      //           blockEmpty &&
+      //           blockIndented
+      //         ) {
+      //           return commands.liftListItem("blockContainer");
+      //         }
+
+      //         return false;
+      //       }),
+      //     // Creates a new block and moves the selection to it if the current one is empty, while the selection is also
+      //     // empty & at the start of the block.
+      //     () =>
+      //       commands.command(({ state, chain }) => {
+      //         const { node, endPos } = getBlockInfoFromPos(
+      //           state.doc,
+      //           state.selection.from
+      //         )!;
+
+      //         const selectionAtBlockStart =
+      //           state.selection.$anchor.parentOffset === 0;
+      //         const selectionEmpty =
+      //           state.selection.anchor === state.selection.head;
+      //         const blockEmpty = node.textContent.length === 0;
+
+      //         if (selectionAtBlockStart && selectionEmpty && blockEmpty) {
+      //           const newBlockInsertionPos = endPos + 1;
+      //           const newBlockContentPos = newBlockInsertionPos + 2;
+
+      //           chain()
+      //             .BNCreateBlock(newBlockInsertionPos)
+      //             .setTextSelection(newBlockContentPos)
+      //             .run();
+
+      //           return true;
+      //         }
+
+      //         return false;
+      //       }),
+      //     // Splits the current block, moving content inside that's after the cursor to a new text block below. Also
+      //     // deletes the selection beforehand, if it's not empty.
+      //     () =>
+      //       commands.command(({ state, chain }) => {
+      //         const { node } = getBlockInfoFromPos(
+      //           state.doc,
+      //           state.selection.from
+      //         )!;
+
+      //         const selectionAtBlockStart =
+      //           state.selection.$anchor.parentOffset === 0;
+      //         const blockEmpty = node.textContent.length === 0;
+
+      //         if (!blockEmpty) {
+      //           chain()
+      //             .deleteSelection()
+      //             .BNSplitBlock(state.selection.from, selectionAtBlockStart)
+      //             .run();
+
+      //           return true;
+      //         }
+
+      //         return false;
+      //       }),
+      //   ]);
 
     const handleEnter = () => {
       return this.editor.commands.first(({ commands }) => [
@@ -772,11 +839,7 @@ export const BlockContainer = Node.create<{
               state.selection.from
             )!;
 
-<<<<<<< HEAD:packages/core/src/pm-nodes/BlockContainer.ts
-            const selectionAtBlockStart =
-              state.selection.$anchor.parentOffset === 0;
-            const blockEmpty = node.textContent.length === 0;
-=======
+            const selectionAtBlockStart = state.selection.$anchor.parentOffset === 0;
             let blockEmpty = node.textContent.length === 0;
 
             if (
@@ -789,7 +852,6 @@ export const BlockContainer = Node.create<{
                 }
               });
             }
->>>>>>> mine:packages/core/src/extensions/Blocks/nodes/BlockContainer.ts
 
             if (!blockEmpty) {
               const result = chain()
@@ -809,7 +871,6 @@ export const BlockContainer = Node.create<{
       Backspace: handleBackspace,
       Delete: handleDelete,
       Enter: handleEnter,
-      Delete: handleDelete,
       // Always returning true for tab key presses ensures they're not captured by the browser. Otherwise, they blur the
       // editor since the browser will try to use tab for keyboard navigation.
       Tab: () => {
@@ -858,29 +919,27 @@ export const BlockContainer = Node.create<{
         this.editor.commands.BNCreateBlock(
           this.editor.state.selection.anchor + 2
         ),
-<<<<<<< HEAD:packages/core/src/pm-nodes/BlockContainer.ts
-=======
-      "Mod-Alt-1": () =>
-        this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
-          type: "heading",
-          props: {
-            level: "1",
-          },
-        }),
-      "Mod-Alt-2": () =>
-        this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
-          type: "heading",
-          props: {
-            level: "2",
-          },
-        }),
-      "Mod-Alt-3": () =>
-        this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
-          type: "heading",
-          props: {
-            level: "3",
-          },
-        }),
+      // "Mod-Alt-1": () =>
+      //   this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
+      //     type: "heading",
+      //     props: {
+      //       level: "1",
+      //     },
+      //   }),
+      // "Mod-Alt-2": () =>
+      //   this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
+      //     type: "heading",
+      //     props: {
+      //       level: "2",
+      //     },
+      //   }),
+      // "Mod-Alt-3": () =>
+      //   this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
+      //     type: "heading",
+      //     props: {
+      //       level: "3",
+      //     },
+      //   }),
       "Mod-Alt-9": () =>
         this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
           type: "bulletListItem",
@@ -891,7 +950,6 @@ export const BlockContainer = Node.create<{
           type: "numberedListItem",
           props: {},
         }),
->>>>>>> mine:packages/core/src/extensions/Blocks/nodes/BlockContainer.ts
     };
   },
 });
