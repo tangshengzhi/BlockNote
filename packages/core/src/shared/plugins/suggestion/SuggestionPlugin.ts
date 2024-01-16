@@ -7,6 +7,7 @@ import { BaseUiElementState } from "../../BaseUiElementTypes";
 import { SuggestionItem } from "./SuggestionItem";
 import { findScrollContainer } from "../../..";
 import { isActive } from "@tiptap/core";
+import { getBlockInfoFromPos } from "../../../extensions/Blocks/helpers/getBlockInfoFromPos";
 
 export type SuggestionsMenuState<T extends SuggestionItem> =
   BaseUiElementState & {
@@ -117,7 +118,8 @@ type SuggestionPluginState<T extends SuggestionItem> = {
   triggerCharacter: string | undefined;
   // The editor position just after the trigger character, i.e. where the user query begins. Used to figure out
   // which menu items to show and can also be used to delete the trigger character.
-  queryStartPos: number | undefined;
+  queryStartPos: number | undefined; // 由固定位置改为block内部的偏移量
+  // queryStartPosBlockInfo: any;
   // The items that should be shown in the menu.
   items: T[];
   // The index of the item in the menu that's currently hovered using the keyboard.
@@ -135,6 +137,7 @@ function getDefaultPluginState<
     active: false,
     triggerCharacter: undefined,
     queryStartPos: undefined,
+    // queryStartPosBlockInfo: undefined,
     items: [] as T[],
     keyboardHoveredItemIndex: undefined,
     notFoundCount: 0,
@@ -208,14 +211,15 @@ export const setupSuggestionsMenu = <
           if (transaction.getMeta("orderedListIndexing") !== undefined) {
             return prev;
           }
-
+          const blockInfo = getBlockInfoFromPos(editor._tiptapEditor.state.doc, newState.selection.from);
           // Checks if the menu should be shown.
           if (transaction.getMeta(pluginKey)?.activate) {
             return {
               active: true,
               triggerCharacter:
                 transaction.getMeta(pluginKey)?.triggerCharacter || "",
-              queryStartPos: newState.selection.from,
+              queryStartPos: newState.selection.from - blockInfo.startPos,
+              // queryStartPosBlockInfo: blockInfo,
               items: items(""),
               keyboardHoveredItemIndex: 0,
               // TODO: Maybe should be 1 if the menu has no possible items? Probably redundant since a menu with no items
@@ -234,9 +238,10 @@ export const setupSuggestionsMenu = <
 
           // Updates which menu items to show by checking which items the current query (the text between the trigger
           // character and caret) matches with.
+          const realQueryStartPos = blockInfo.startPos + prev.queryStartPos!
           next.items = items(
             newState.doc.textBetween(
-              prev.queryStartPos!,
+              realQueryStartPos,
               newState.selection.from
             )
           );
@@ -266,7 +271,7 @@ export const setupSuggestionsMenu = <
             transaction.getMeta("blur") ||
             transaction.getMeta("pointer") ||
             // Moving the caret before the character which triggered the menu should hide it.
-            (prev.active && newState.selection.from < prev.queryStartPos!) ||
+            (prev.active && newState.selection.from < realQueryStartPos) ||
             // Entering more than 3 characters, after the last query that matched with at least 1 menu item, should hide
             // the menu.
             next.notFoundCount > 3
@@ -357,7 +362,8 @@ export const setupSuggestionsMenu = <
             );
             return true;
           }
-
+          const blockInfo = getBlockInfoFromPos(editor._tiptapEditor.state.doc, editor._tiptapEditor.state.selection.from);
+          const realQueryStartPos = queryStartPos + blockInfo.startPos
           // Selects an item and closes the menu.
           if (event.key === "Enter") {
             deactivate(view);
@@ -365,7 +371,7 @@ export const setupSuggestionsMenu = <
               .chain()
               .focus()
               .deleteRange({
-                from: queryStartPos! - triggerCharacter!.length,
+                from: realQueryStartPos - triggerCharacter!.length,
                 to: editor._tiptapEditor.state.selection.from,
               })
               .run();
@@ -432,12 +438,14 @@ export const setupSuggestionsMenu = <
     }),
     itemCallback: (item: T) => {
       deactivate(editor._tiptapEditor.view);
+      const blockInfo = getBlockInfoFromPos(editor._tiptapEditor.state.doc, editor._tiptapEditor.state.selection.from);
+      const realQueryStartPos = suggestionsPluginView.pluginState.queryStartPos! + blockInfo.startPos
       editor._tiptapEditor
         .chain()
         .focus()
         .deleteRange({
           from:
-            suggestionsPluginView.pluginState.queryStartPos! -
+            realQueryStartPos -
             suggestionsPluginView.pluginState.triggerCharacter!.length,
           to: editor._tiptapEditor.state.selection.from,
         })
