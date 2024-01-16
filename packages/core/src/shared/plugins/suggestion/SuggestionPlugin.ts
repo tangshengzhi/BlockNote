@@ -245,7 +245,7 @@ export const setupSuggestionsMenu = <
           //   return prev;
           // }
           const newBlock = getBlockInfoFromPos(editor._tiptapEditor.state.doc, newState.selection.from);
-          const realTextList = new Array(blockInfo.endPos - blockInfo.startPos).fill(null).map((item, index) => {
+          const realTextList = new Array(blockInfo.endPos - blockInfo.startPos).fill(null).map((_, index) => {
             return newState.doc.textBetween(
               blockInfo.startPos + index,
               blockInfo.startPos + index + 1
