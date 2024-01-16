@@ -93,13 +93,15 @@ class SuggestionsMenuView<
       `[data-decoration-id="${this.pluginState.decorationId}"]`
     );
 
-    if (this.editor.isEditable && decorationNode) {
-      this.suggestionsMenuState = {
-        show: true,
-        referencePos: decorationNode!.getBoundingClientRect(),
-        filteredItems: this.pluginState.items,
-        keyboardHoveredItemIndex: this.pluginState.keyboardHoveredItemIndex!,
-      };
+    if (this.editor.isEditable) {
+      if (decorationNode) {
+        this.suggestionsMenuState = {
+          show: true,
+          referencePos: decorationNode.getBoundingClientRect(),
+          filteredItems: this.pluginState.items,
+          keyboardHoveredItemIndex: this.pluginState.keyboardHoveredItemIndex!,
+        };
+      }
 
       this.updateSuggestionsMenu();
     }
@@ -239,6 +241,21 @@ export const setupSuggestionsMenu = <
           // Updates which menu items to show by checking which items the current query (the text between the trigger
           // character and caret) matches with.
           const realQueryStartPos = blockInfo.startPos + prev.queryStartPos!
+          // if (newState.selection.from < realQueryStartPos) {
+          //   return prev;
+          // }
+          const newBlock = getBlockInfoFromPos(editor._tiptapEditor.state.doc, newState.selection.from);
+          const realTextList = new Array(blockInfo.endPos - blockInfo.startPos).fill(null).map((item, index) => {
+            return newState.doc.textBetween(
+              blockInfo.startPos + index,
+              blockInfo.startPos + index + 1
+            )
+          }).filter(i => i)
+          if (blockInfo.id === newBlock.id && realTextList.length === (blockInfo.endPos - blockInfo.startPos - 2)) {
+            prev.items = [...prev.items] // 强制触发update, 更新位置
+            return prev;
+          }
+
           next.items = items(
             newState.doc.textBetween(
               realQueryStartPos,
