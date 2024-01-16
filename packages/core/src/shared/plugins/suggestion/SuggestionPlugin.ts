@@ -93,7 +93,7 @@ class SuggestionsMenuView<
       `[data-decoration-id="${this.pluginState.decorationId}"]`
     );
 
-    if (this.editor.isEditable) {
+    if (this.editor.isEditable && decorationNode) {
       this.suggestionsMenuState = {
         show: true,
         referencePos: decorationNode!.getBoundingClientRect(),
@@ -421,11 +421,13 @@ export const setupSuggestionsMenu = <
               ]);
             }
           }
+          const blockInfo = getBlockInfoFromPos(editor._tiptapEditor.state.doc, editor._tiptapEditor.state.selection.from);
+          const realQueryStartPos = queryStartPos! + blockInfo.startPos
           // Creates an inline decoration around the trigger character.
           return DecorationSet.create(state.doc, [
             Decoration.inline(
-              queryStartPos - triggerCharacter.length,
-              queryStartPos,
+              realQueryStartPos - triggerCharacter.length,
+              realQueryStartPos,
               {
                 nodeName: "span",
                 class: "suggestion-decorator",
