@@ -9,6 +9,7 @@ import { findScrollContainer } from "../../..";
 import { isActive } from "@tiptap/core";
 import { getBlockInfoFromPos } from "../../../extensions/Blocks/helpers/getBlockInfoFromPos";
 
+
 export type SuggestionsMenuState<T extends SuggestionItem> =
   BaseUiElementState & {
     // The suggested items to display.
@@ -251,10 +252,7 @@ export const setupSuggestionsMenu = <
               blockInfo.startPos + index + 1
             )
           }).filter(i => i)
-          if (blockInfo.id === newBlock.id && realTextList.length === (blockInfo.endPos - blockInfo.startPos - 2)) {
-            prev.items = [...prev.items] // 强制触发update, 更新位置
-            return prev;
-          }
+      
 
           next.items = items(
             newState.doc.textBetween(
@@ -315,6 +313,13 @@ export const setupSuggestionsMenu = <
             next.keyboardHoveredItemIndex = newIndex;
           } else if (oldState.selection.from !== newState.selection.from) {
             next.keyboardHoveredItemIndex = 0;
+          }
+
+          if (blockInfo.id === newBlock.id && realTextList.length === (blockInfo.endPos - blockInfo.startPos - 2)) {
+            // prev.items = [...prev.items] // 强制触发update, 更新位置
+            // return prev;
+            next.items = [...prev.items];
+            next.notFoundCount = prev.notFoundCount;
           }
 
           return next;
