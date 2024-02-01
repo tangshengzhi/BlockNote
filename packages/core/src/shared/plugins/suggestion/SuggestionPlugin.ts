@@ -320,7 +320,6 @@ export const setupSuggestionsMenu = <
             // return prev;
             next.items = [...prev.items];
             next.notFoundCount = prev.notFoundCount;
-            next.keyboardHoveredItemIndex = prev.keyboardHoveredItemIndex;
           }
 
           return next;
