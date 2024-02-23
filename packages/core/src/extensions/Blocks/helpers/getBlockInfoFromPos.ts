@@ -71,13 +71,13 @@ export function getBlockInfoFromPos(doc: Node, pos: number): BlockInfo {
   // nearest block. This happens when the collaboration plugin is active, where
   // the selection is placed at the very end of the doc.
   
-  getSuitablePos(doc, pos);
+  pos = getSuitablePos(doc, pos);
  // This gets triggered when a node selection on a block is active, i.e. when
   // you drag and drop a block.
   if (doc.resolve(pos).parent.type.name === "blockGroup") {
     pos++;
   }
-  getSuitablePos(doc, pos);
+  pos = getSuitablePos(doc, pos);
   
   const $pos = doc.resolve(pos);
 
