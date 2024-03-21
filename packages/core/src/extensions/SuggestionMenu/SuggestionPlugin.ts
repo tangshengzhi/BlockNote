@@ -6,6 +6,7 @@ import type { BlockNoteEditor } from "../../editor/BlockNoteEditor";
 import { BlockSchema, InlineContentSchema, StyleSchema } from "../../schema";
 import { UiElementPosition } from "../../extensions-shared/UiElementPosition";
 import { EventEmitter } from "../../util/EventEmitter";
+import { findScrollContainer } from "../../util/browser";
 
 const findBlock = findParentNode((node) => node.type.name === "blockContainer");
 
@@ -37,7 +38,7 @@ class SuggestionMenuView<
       emitUpdate(menuName, this.state);
     };
 
-    document.addEventListener("scroll", this.handleScroll);
+    findScrollContainer(editor.domElement).addEventListener("scroll", this.handleScroll);
   }
 
   handleScroll = () => {
@@ -92,7 +93,7 @@ class SuggestionMenuView<
   }
 
   destroy() {
-    document.removeEventListener("scroll", this.handleScroll);
+    findScrollContainer(this.editor.domElement).removeEventListener("scroll", this.handleScroll);
   }
 
   closeMenu = () => {

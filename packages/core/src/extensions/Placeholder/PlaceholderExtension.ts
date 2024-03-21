@@ -21,10 +21,13 @@ export const Placeholder = Extension.create<PlaceholderOptions>({
   addOptions() {
     return {
       placeholders: {
-        default: "Enter text or type '/' for commands",
-        heading: "Heading",
-        bulletListItem: "List",
-        numberedListItem: "List",
+        // default: "Enter text or type '/' for commands",
+        default: `var(--editor-placeholder, "Enter text or type '/' for commands")`,
+        // heading: "Heading",
+        heading: `var(--editor-heading, "Heading")`,
+        // bulletListItem: "List",
+        bulletListItem: `var(--editor-list, "List")`,
+        numberedListItem: `var(--editor-list, "List")`,
       },
     };
   },
@@ -65,7 +68,7 @@ export const Placeholder = Extension.create<PlaceholderOptions>({
               `${getSelector(
                 blockType,
                 mustBeFocused
-              )}{ content: ${JSON.stringify(placeholder)}; }`
+              )}{ content: ${JSON.stringify(placeholder)}; color:#cfcfcf; }`
             );
 
             // For some reason, the placeholders which show when the block is focused

@@ -12,6 +12,7 @@ import {
 } from "../../schema";
 import { EventEmitter } from "../../util/EventEmitter";
 import { getDraggableBlockFromCoords } from "../SideMenu/SideMenuPlugin";
+import { findScrollContainer } from "../../util/browser";
 
 let dragImageElement: HTMLElement | undefined;
 
@@ -120,7 +121,7 @@ export class TableHandlesView<
     document.addEventListener("dragover", this.dragOverHandler);
     document.addEventListener("drop", this.dropHandler);
 
-    document.addEventListener("scroll", this.scrollHandler);
+    findScrollContainer(pmView.dom).addEventListener("scroll", this.scrollHandler);
   }
 
   mouseMoveHandler = (event: MouseEvent) => {
@@ -355,7 +356,7 @@ export class TableHandlesView<
     document.removeEventListener("dragover", this.dragOverHandler);
     document.removeEventListener("drop", this.dropHandler);
 
-    document.removeEventListener("scroll", this.scrollHandler);
+    findScrollContainer(this.pmView.dom).removeEventListener("scroll", this.scrollHandler);
   }
 }
 

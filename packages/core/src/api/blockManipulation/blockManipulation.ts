@@ -30,9 +30,12 @@ export function insertBlocks<
 
   const nodesToInsert: Node[] = [];
   for (const blockSpec of blocksToInsert) {
-    nodesToInsert.push(
-      blockToNode(blockSpec, ttEditor.schema, editor.schema.styleSchema)
-    );
+    // nodesToInsert.push(
+    //   blockToNode(blockSpec, ttEditor.schema, editor.schema.styleSchema)
+    // );
+    const node = blockToNode(blockSpec, ttEditor.schema, editor.schema.styleSchema)
+    nodesToInsert.push(node);
+    blockSpec.id = node.attrs.id;
   }
 
   const { node, posBeforeNode } = getNodeById(id, ttEditor.state.doc);

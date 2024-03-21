@@ -18,3 +18,21 @@ export function mergeCSSClasses(...classes: string[]) {
 
 export const isSafari = () =>
   /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+
+export function findScrollContainer(
+  element: HTMLElement
+): HTMLElement | Document {
+  let parent: HTMLElement | null = element.parentElement;
+  while (parent) {
+    const { overflow } = window.getComputedStyle(parent);
+    if (overflow.split(" ").every((o) => o === "auto" || o === "scroll")) {
+      return parent;
+    }
+
+    parent = parent.parentElement;
+  }
+
+  return document;
+}
+  

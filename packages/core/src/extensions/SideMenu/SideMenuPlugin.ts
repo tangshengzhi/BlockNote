@@ -14,6 +14,7 @@ import { BlockSchema, InlineContentSchema, StyleSchema } from "../../schema";
 import { EventEmitter } from "../../util/EventEmitter";
 import { suggestionMenuPluginKey } from "../SuggestionMenu/SuggestionPlugin";
 import { MultipleNodeSelection } from "./MultipleNodeSelection";
+import { findScrollContainer } from "../../util/browser";
 
 let dragImageElement: Element | undefined;
 
@@ -294,7 +295,7 @@ export class SideMenuView<
     document.body.addEventListener("mousemove", this.onMouseMove, true);
 
     // Makes menu scroll with the page.
-    document.addEventListener("scroll", this.onScroll);
+    findScrollContainer(this.pmView.dom).addEventListener("scroll", this.onScroll);
 
     // Unfreezes the menu whenever the user clicks anywhere.
     document.body.addEventListener("mousedown", this.onMouseDown, true);
@@ -519,7 +520,7 @@ export class SideMenuView<
     document.body.removeEventListener("dragover", this.onDragOver);
     this.pmView.dom.removeEventListener("dragstart", this.onDragStart);
     document.body.removeEventListener("drop", this.onDrop, true);
-    document.removeEventListener("scroll", this.onScroll);
+    findScrollContainer(this.pmView.dom).removeEventListener("scroll", this.onScroll);
     document.body.removeEventListener("mousedown", this.onMouseDown, true);
     document.body.removeEventListener("keydown", this.onKeyDown, true);
   }

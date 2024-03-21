@@ -7,6 +7,7 @@ import type { BlockNoteEditor } from "../../editor/BlockNoteEditor";
 import { BlockSchema, InlineContentSchema, StyleSchema } from "../../schema";
 import { UiElementPosition } from "../../extensions-shared/UiElementPosition";
 import { EventEmitter } from "../../util/EventEmitter";
+import { findScrollContainer } from "../../util/browser";
 
 export type LinkToolbarState = UiElementPosition & {
   // The hovered link's URL, and the text it's displayed with in the
@@ -62,7 +63,7 @@ class LinkToolbarView {
 
     this.pmView.dom.addEventListener("mouseover", this.mouseOverHandler);
     document.addEventListener("click", this.clickHandler, true);
-    document.addEventListener("scroll", this.scrollHandler);
+    findScrollContainer(this.pmView.dom).addEventListener("scroll", this.scrollHandler);
   }
 
   mouseOverHandler = (event: MouseEvent) => {
@@ -260,7 +261,7 @@ class LinkToolbarView {
 
   destroy() {
     this.pmView.dom.removeEventListener("mouseover", this.mouseOverHandler);
-    document.removeEventListener("scroll", this.scrollHandler);
+    findScrollContainer(this.pmView.dom).removeEventListener("scroll", this.scrollHandler);
     document.removeEventListener("click", this.clickHandler, true);
   }
 }

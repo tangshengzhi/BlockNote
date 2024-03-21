@@ -10,7 +10,7 @@ import type {
 import { UiElementPosition } from "../../extensions-shared/UiElementPosition";
 import { EventEmitter } from "../../util/EventEmitter";
 import { DefaultBlockSchema } from "../../blocks/defaultBlocks";
-
+import { findScrollContainer } from "../../util/browser";
 export type ImagePanelState<
   I extends InlineContentSchema,
   S extends StyleSchema
@@ -47,7 +47,7 @@ export class ImagePanelView<
 
     pmView.dom.addEventListener("blur", this.blurHandler);
 
-    document.addEventListener("scroll", this.scrollHandler);
+    findScrollContainer(pmView.dom).addEventListener("scroll", this.scrollHandler);
   }
 
   mouseDownHandler = () => {
@@ -138,7 +138,7 @@ export class ImagePanelView<
 
     this.pmView.dom.removeEventListener("blur", this.blurHandler);
 
-    document.removeEventListener("scroll", this.scrollHandler);
+    findScrollContainer(this.pmView.dom).removeEventListener("scroll", this.scrollHandler);
   }
 }
 

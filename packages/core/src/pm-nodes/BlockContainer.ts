@@ -646,6 +646,7 @@ export const BlockContainer = Node.create<{
               chain()
                 .BNCreateBlock(newBlockInsertionPos)
                 .setTextSelection(newBlockContentPos)
+                .scrollIntoView()
                 .run();
 
               return true;

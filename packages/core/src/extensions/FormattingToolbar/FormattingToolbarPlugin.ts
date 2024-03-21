@@ -6,6 +6,7 @@ import type { BlockNoteEditor } from "../../editor/BlockNoteEditor";
 import { UiElementPosition } from "../../extensions-shared/UiElementPosition";
 import { BlockSchema, InlineContentSchema, StyleSchema } from "../../schema";
 import { EventEmitter } from "../../util/EventEmitter";
+import { findScrollContainer } from "../../util/browser";
 
 export type FormattingToolbarState = UiElementPosition;
 
@@ -51,7 +52,11 @@ export class FormattingToolbarView {
     pmView.dom.addEventListener("focus", this.focusHandler);
     pmView.dom.addEventListener("blur", this.blurHandler);
 
-    document.addEventListener("scroll", this.scrollHandler);
+    // document.addEventListener("scroll", this.scrollHandler);
+    findScrollContainer(pmView.dom).addEventListener(
+      "scroll",
+      this.scrollHandler
+    );
   }
 
   viewMousedownHandler = () => {
@@ -177,7 +182,7 @@ export class FormattingToolbarView {
     this.pmView.dom.removeEventListener("focus", this.focusHandler);
     this.pmView.dom.removeEventListener("blur", this.blurHandler);
 
-    document.removeEventListener("scroll", this.scrollHandler);
+    findScrollContainer(this.pmView.dom).removeEventListener("scroll", this.scrollHandler);
   }
 
   getSelectionBoundingBox() {
