@@ -91,7 +91,7 @@ export class TableHandlesView<
 {
   public state?: TableHandlesState<I, S>;
   public emitUpdate: () => void;
-
+  private timer: any;
   public tableId: string | undefined;
   public tablePos: number | undefined;
 
@@ -120,8 +120,9 @@ export class TableHandlesView<
 
     document.addEventListener("dragover", this.dragOverHandler);
     document.addEventListener("drop", this.dropHandler);
-
-    findScrollContainer(pmView.dom).addEventListener("scroll", this.scrollHandler);
+    this.timer = setTimeout(() => {
+      findScrollContainer(pmView.dom).addEventListener("scroll", this.scrollHandler);
+    })
   }
 
   mouseMoveHandler = (event: MouseEvent) => {
@@ -357,6 +358,7 @@ export class TableHandlesView<
     document.removeEventListener("drop", this.dropHandler);
 
     findScrollContainer(this.pmView.dom).removeEventListener("scroll", this.scrollHandler);
+    clearTimeout(this.timer);
   }
 }
 

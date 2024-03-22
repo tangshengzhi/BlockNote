@@ -27,7 +27,7 @@ export class ImagePanelView<
   public emitUpdate: () => void;
 
   public prevWasEditable: boolean | null = null;
-
+  private timer: any
   constructor(
     private readonly pluginKey: PluginKey,
     private readonly pmView: EditorView,
@@ -46,8 +46,10 @@ export class ImagePanelView<
     pmView.dom.addEventListener("dragstart", this.dragstartHandler);
 
     pmView.dom.addEventListener("blur", this.blurHandler);
-
-    findScrollContainer(pmView.dom).addEventListener("scroll", this.scrollHandler);
+    this.timer = setTimeout(() => {
+      findScrollContainer(pmView.dom).addEventListener("scroll", this.scrollHandler);
+    })
+    
   }
 
   mouseDownHandler = () => {
@@ -137,7 +139,7 @@ export class ImagePanelView<
     this.pmView.dom.removeEventListener("dragstart", this.dragstartHandler);
 
     this.pmView.dom.removeEventListener("blur", this.blurHandler);
-
+    clearTimeout(this.timer)
     findScrollContainer(this.pmView.dom).removeEventListener("scroll", this.scrollHandler);
   }
 }

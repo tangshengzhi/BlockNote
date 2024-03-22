@@ -54,6 +54,8 @@
     "clean": "rimraf dist && rimraf types"
   },
   "dependencies": {
+    "linkifyjs": "^4.1.1",
+    "redom": "^3.29.1",
     "@tiptap/core": "^2.0.3",
     "@tiptap/extension-bold": "^2.0.3",
     "@tiptap/extension-code": "^2.0.3",

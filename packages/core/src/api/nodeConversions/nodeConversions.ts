@@ -18,7 +18,7 @@ import type {
   TableContent,
 } from "../../schema";
 import { getBlockInfo } from "../getBlockInfoFromPos";
-
+import { defaultProps } from "../../blocks/defaultProps";
 import type { Block, PartialBlock } from "../../blocks/defaultBlocks";
 import {
   isLinkInlineContent,
@@ -50,6 +50,11 @@ function styledTextToNodes<T extends StyleSchema>(
       marks.push(schema.mark(style, { stringValue: value }));
     } else {
       throw new UnreachableCaseError(config.propSchema);
+    }
+  }
+  if (styledText.attrs) {
+    for (const [type, value] of Object.entries(styledText.attrs)) {
+      marks.push(schema.mark(type, value));
     }
   }
 
@@ -112,7 +117,7 @@ function styledTextArrayToNodes<S extends StyleSchema>(
   if (typeof content === "string") {
     nodes.push(
       ...styledTextToNodes(
-        { type: "text", text: content, styles: {} },
+        { type: "text", text: content, styles: {}, attrs: {} },
         schema,
         styleSchema
       )
@@ -333,6 +338,7 @@ export function contentNodeToInlineContent<
           type: "text",
           text: "\n",
           styles: {},
+          attrs: {},
         };
       }
 
@@ -357,6 +363,7 @@ export function contentNodeToInlineContent<
     }
 
     const styles: Styles<S> = {};
+    const extendAttrs: Record<string, any> = {};
     let linkMark: Mark | undefined;
 
     for (const mark of node.marks) {
@@ -372,7 +379,8 @@ export function contentNodeToInlineContent<
         } else if (config.propSchema === "string") {
           (styles as any)[config.type] = mark.attrs.stringValue;
         } else {
-          throw new UnreachableCaseError(config.propSchema);
+          // throw new UnreachableCaseError(config.propSchema);
+          extendAttrs[mark.type.name] = mark.attrs;
         }
       }
     }
@@ -382,23 +390,7 @@ export function contentNodeToInlineContent<
     if (currentContent) {
       // Current content is text.
       if (isStyledTextInlineContent(currentContent)) {
-        if (!linkMark) {
-          // Node is text (same type as current content).
-          if (
-            JSON.stringify(currentContent.styles) === JSON.stringify(styles)
-          ) {
-            // Styles are the same.
-            currentContent.text += node.textContent;
-          } else {
-            // Styles are different.
-            content.push(currentContent);
-            currentContent = {
-              type: "text",
-              text: node.textContent,
-              styles,
-            };
-          }
-        } else {
+        if (linkMark) {
           // Node is a link (different type to current content).
           content.push(currentContent);
           currentContent = {
@@ -409,8 +401,35 @@ export function contentNodeToInlineContent<
                 type: "text",
                 text: node.textContent,
                 styles,
+                attrs: extendAttrs,
               },
             ],
+          };
+        } else if (node.type.name === "text") {
+          // Node is text (same type as current content).
+          if (
+            JSON.stringify(currentContent.styles) === JSON.stringify(styles) && 
+            JSON.stringify(currentContent.attrs) === JSON.stringify(extendAttrs)
+          ) {
+            // Styles are the same.
+            currentContent.text += node.textContent;
+          } else {
+            // Styles are different.
+            content.push(currentContent);
+            currentContent = {
+              type: "text",
+              text: node.textContent,
+              styles,
+              attrs: extendAttrs,
+            };
+          }
+        } else {
+          content.push(currentContent);
+          currentContent = {
+            type: node.type.name as any,
+            text: node.textContent,
+            styles,
+            attrs: { ...extendAttrs, ...node.attrs },
           };
         }
       } else if (isLinkInlineContent(currentContent)) {
@@ -433,6 +452,7 @@ export function contentNodeToInlineContent<
                 type: "text",
                 text: node.textContent,
                 styles,
+                attrs: extendAttrs,
               });
             }
           } else {
@@ -446,6 +466,7 @@ export function contentNodeToInlineContent<
                   type: "text",
                   text: node.textContent,
                   styles,
+                  attrs: extendAttrs,
                 },
               ],
             };
@@ -457,24 +478,51 @@ export function contentNodeToInlineContent<
             type: "text",
             text: node.textContent,
             styles,
+            attrs: extendAttrs,
           };
         }
       } else {
         // TODO
+        
+        if (linkMark) {
+          currentContent = {
+            type: "link",
+            href: linkMark.attrs.href,
+            content: [
+              {
+                type: "text",
+                text: node.textContent,
+                styles,
+                attrs: extendAttrs,
+              },
+            ],
+          };
+        } else if (node.type.name === "text") {
+          content.push(currentContent);
+          currentContent = {
+            type: "text",
+            text: node.textContent,
+            styles,
+            attrs: extendAttrs,
+          };
+        } else {
+          content.push(currentContent);
+
+          currentContent = {
+            type: node.type.name as any,
+            text: node.textContent,
+            styles,
+            content: contentNodeToInlineContent(node, inlineContentSchema, styleSchema) as any,
+            attrs: { ...extendAttrs, ...node.attrs },
+          };
+        }
+
       }
     }
     // Current content does not exist.
     else {
-      // Node is text.
-      if (!linkMark) {
-        currentContent = {
-          type: "text",
-          text: node.textContent,
-          styles,
-        };
-      }
       // Node is a link.
-      else {
+      if (linkMark) {
         currentContent = {
           type: "link",
           href: linkMark.attrs.href,
@@ -483,9 +531,39 @@ export function contentNodeToInlineContent<
               type: "text",
               text: node.textContent,
               styles,
+              attrs: extendAttrs,
             },
           ],
         };
+      }
+      // Node is text.
+      else if(node.type.name === "text") {
+        currentContent = {
+          type: "text",
+          text: node.textContent,
+          styles,
+          attrs: extendAttrs,
+        };
+      } else {
+        // currentContent = {
+        //   type: "link",
+        //   href: linkMark.attrs.href,
+        //   content: [
+        //     {
+        //       type: "text",
+        //       text: node.textContent,
+        //       styles,
+        //       attrs: extendAttrs,
+        //     },
+        //   ],
+        // };
+        content.push({
+          type: node.type.name as any,
+          text: node.textContent,
+          styles,
+          content: contentNodeToInlineContent(node, inlineContentSchema, styleSchema) as any,
+          attrs: { ...extendAttrs, ...node.attrs },
+        });
       }
     }
   });
@@ -578,21 +656,29 @@ export function nodeToBlock<
   }
 
   const props: any = {};
-  for (const [attr, value] of Object.entries({
-    ...node.attrs,
-    ...blockInfo.contentNode.attrs,
-  })) {
-    const blockSpec = blockSchema[blockInfo.contentType.name];
 
-    if (!blockSpec) {
-      throw Error(
-        "Block is of an unrecognized type: " + blockInfo.contentType.name
-      );
+  const blockSpec = blockSchema[blockInfo.contentType.name];
+  if (blockSpec) {
+    for (const [attr, value] of Object.entries({
+      ...node.attrs,
+      ...blockInfo.contentNode.attrs,
+    })) {
+      if (!blockSpec) {
+        throw Error(
+          "Block is of an unrecognized type: " + blockInfo.contentType.name
+        );
+      }
+
+      const propSchema = blockSpec.propSchema;
+
+      if (attr in propSchema) {
+        props[attr] = value;
+      } else if (attr !== "id" && !(attr in defaultProps)) {
+        console.warn("Block has an unrecognized attribute: " + attr);
+      }
     }
-
-    const propSchema = blockSpec.propSchema;
-
-    if (attr in propSchema) {
+  } else {
+    for (const [attr, value] of Object.entries(blockInfo.contentNode.attrs)) {
       props[attr] = value;
     }
   }

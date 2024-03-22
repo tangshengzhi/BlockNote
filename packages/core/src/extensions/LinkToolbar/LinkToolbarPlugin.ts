@@ -15,11 +15,25 @@ export type LinkToolbarState = UiElementPosition & {
   url: string;
   text: string;
 };
+export const composePath = (
+  el: HTMLElement,
+  unit = (el: HTMLElement) => el.tagName === "html"
+) => {
+  const path = [] as HTMLElement[];
+  while (el) {
+    path.push(el);
 
+    if (unit(el) || !el.parentElement) {
+      return path;
+    }
+    el = el.parentElement;
+  }
+  return path;
+};
 class LinkToolbarView {
   public state?: LinkToolbarState;
   public emitUpdate: () => void;
-
+  private timer: any
   menuUpdateTimer: ReturnType<typeof setTimeout> | undefined;
   startMenuUpdateTimer: () => void;
   stopMenuUpdateTimer: () => void;
@@ -49,7 +63,7 @@ class LinkToolbarView {
     this.startMenuUpdateTimer = () => {
       this.menuUpdateTimer = setTimeout(() => {
         this.update();
-      }, 250);
+      }, 500);
     };
 
     this.stopMenuUpdateTimer = () => {
@@ -63,7 +77,10 @@ class LinkToolbarView {
 
     this.pmView.dom.addEventListener("mouseover", this.mouseOverHandler);
     document.addEventListener("click", this.clickHandler, true);
-    findScrollContainer(this.pmView.dom).addEventListener("scroll", this.scrollHandler);
+    this.timer = setTimeout(() => {
+      findScrollContainer(this.pmView.dom).addEventListener("scroll", this.scrollHandler);
+    })
+    
   }
 
   mouseOverHandler = (event: MouseEvent) => {
@@ -72,14 +89,17 @@ class LinkToolbarView {
     this.mouseHoveredLinkMarkRange = undefined;
 
     this.stopMenuUpdateTimer();
-
+    const path = composePath(
+      event.target as HTMLElement,
+      (el) => el.dataset.nodeType === "blockContainer" || el.nodeName === "HTML"
+    );
+    const target = path.find((el) => el.nodeName === "A");
     if (
-      event.target instanceof HTMLAnchorElement &&
-      event.target.nodeName === "A"
+      target?.nodeName === "A"
     ) {
       // Finds link mark at the hovered element's position to update mouseHoveredLinkMark and
       // mouseHoveredLinkMarkRange.
-      const hoveredLinkElement = event.target;
+      const hoveredLinkElement = target;
       const posInHoveredLinkMark =
         this.pmView.posAtDOM(hoveredLinkElement, 0) + 1;
       const resolvedPosInHoveredLinkMark =
@@ -106,7 +126,7 @@ class LinkToolbarView {
   };
 
   clickHandler = (event: MouseEvent) => {
-    const editorWrapper = this.pmView.dom.parentElement!;
+    const editorWrapper = this.pmView.dom.parentElement!.parentElement;
 
     if (
       // Toolbar is open.
@@ -151,6 +171,7 @@ class LinkToolbarView {
       this.linkMarkRange!.from + text.length,
       this.pmView.state.schema.mark("link", { href: url })
     );
+    tr.setMeta("preventAutolink", true);
     this.pmView.dispatch(tr);
     this.pmView.focus();
 
@@ -179,7 +200,7 @@ class LinkToolbarView {
   }
 
   update() {
-    if (!this.pmView.hasFocus()) {
+    if (!this.pmView.hasFocus() && this.state?.show === true ) {
       return;
     }
 
@@ -196,25 +217,25 @@ class LinkToolbarView {
 
     // Finds link mark at the editor selection's position to update keyboardHoveredLinkMark and
     // keyboardHoveredLinkMarkRange.
-    if (this.pmView.state.selection.empty) {
-      const marksAtPos = this.pmView.state.selection.$from.marks();
+    // if (this.pmView.state.selection.empty) {
+    //   const marksAtPos = this.pmView.state.selection.$from.marks();
 
-      for (const mark of marksAtPos) {
-        if (
-          mark.type.name === this.pmView.state.schema.mark("link").type.name
-        ) {
-          this.keyboardHoveredLinkMark = mark;
-          this.keyboardHoveredLinkMarkRange =
-            getMarkRange(
-              this.pmView.state.selection.$from,
-              mark.type,
-              mark.attrs
-            ) || undefined;
+    //   for (const mark of marksAtPos) {
+    //     if (
+    //       mark.type.name === this.pmView.state.schema.mark("link").type.name
+    //     ) {
+    //       this.keyboardHoveredLinkMark = mark;
+    //       this.keyboardHoveredLinkMarkRange =
+    //         getMarkRange(
+    //           this.pmView.state.selection.$from,
+    //           mark.type,
+    //           mark.attrs
+    //         ) || undefined;
 
-          break;
-        }
-      }
-    }
+    //       break;
+    //     }
+    //   }
+    // }
 
     if (this.mouseHoveredLinkMark) {
       this.linkMark = this.mouseHoveredLinkMark;
@@ -263,8 +284,10 @@ class LinkToolbarView {
     this.pmView.dom.removeEventListener("mouseover", this.mouseOverHandler);
     findScrollContainer(this.pmView.dom).removeEventListener("scroll", this.scrollHandler);
     document.removeEventListener("click", this.clickHandler, true);
+    clearTimeout(this.timer)
   }
 }
+
 
 export const linkToolbarPluginKey = new PluginKey("LinkToolbarPlugin");
 

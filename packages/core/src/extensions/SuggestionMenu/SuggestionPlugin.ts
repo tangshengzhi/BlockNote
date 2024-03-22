@@ -7,6 +7,7 @@ import { BlockSchema, InlineContentSchema, StyleSchema } from "../../schema";
 import { UiElementPosition } from "../../extensions-shared/UiElementPosition";
 import { EventEmitter } from "../../util/EventEmitter";
 import { findScrollContainer } from "../../util/browser";
+import { isActive } from "@tiptap/core";
 
 const findBlock = findParentNode((node) => node.type.name === "blockContainer");
 
@@ -20,6 +21,7 @@ class SuggestionMenuView<
   S extends StyleSchema
 > {
   private state?: SuggestionMenuState;
+  private timer: any;
   public emitUpdate: (triggerCharacter: string) => void;
 
   pluginState: SuggestionPluginState;
@@ -37,8 +39,9 @@ class SuggestionMenuView<
 
       emitUpdate(menuName, this.state);
     };
-
-    findScrollContainer(editor.domElement).addEventListener("scroll", this.handleScroll);
+    this.timer = setTimeout(() => {
+      findScrollContainer(editor.domElement).addEventListener("scroll", this.handleScroll);
+    })
   }
 
   handleScroll = () => {
@@ -94,6 +97,7 @@ class SuggestionMenuView<
 
   destroy() {
     findScrollContainer(this.editor.domElement).removeEventListener("scroll", this.handleScroll);
+    clearTimeout(this.timer)
   }
 
   closeMenu = () => {
@@ -255,8 +259,13 @@ export class SuggestionMenuProseMirrorPlugin<
             triggerCharacters.includes(event.key) &&
             suggestionPluginState === undefined
           ) {
+            if (
+              isActive(view.state, "codeBlock") ||
+              isActive(view.state, "code")
+            ) {
+              return false;
+            }
             event.preventDefault();
-
             view.dispatch(
               view.state.tr
                 .insertText(event.key)

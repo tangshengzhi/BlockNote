@@ -98,6 +98,7 @@ export type StyledText<T extends StyleSchema> = {
   type: "text";
   text: string;
   styles: Styles<T>;
+  attrs?: Record<string, Record<string, any>>;
 };
 
 export type Link<T extends StyleSchema> = {

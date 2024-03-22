@@ -8,7 +8,8 @@ import { Dropcursor } from "@tiptap/extension-dropcursor";
 import { Gapcursor } from "@tiptap/extension-gapcursor";
 import { HardBreak } from "@tiptap/extension-hard-break";
 import { History } from "@tiptap/extension-history";
-import { Link } from "@tiptap/extension-link";
+// import { Link } from "@tiptap/extension-link";
+import { Link } from "../extensions/Link";
 import { Text } from "@tiptap/extension-text";
 import * as Y from "yjs";
 import { createCopyToClipboardExtension } from "../api/exporters/copyExtension";
@@ -56,7 +57,7 @@ export const getBlockNoteExtensions = <
   };
 }) => {
   const ret: Extensions = [
-    extensions.ClipboardTextSerializer,
+    // extensions.ClipboardTextSerializer,
     extensions.Commands,
     extensions.Editable,
     extensions.FocusEvents,
@@ -82,7 +83,11 @@ export const getBlockNoteExtensions = <
     Text,
 
     // marks:
-    Link,
+    Link.configure({
+      linkOnPaste: true,
+      openOnClick: false,
+      autolink: false,
+    }),
     ...Object.values(opts.styleSpecs).map((styleSpec) => {
       return styleSpec.implementation.mark;
     }),

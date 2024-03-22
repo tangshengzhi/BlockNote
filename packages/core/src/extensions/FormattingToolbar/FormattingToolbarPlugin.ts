@@ -17,7 +17,7 @@ export class FormattingToolbarView {
   public preventHide = false;
   public preventShow = false;
   public prevWasEditable: boolean | null = null;
-
+  private timer: any
   public shouldShow: (props: {
     view: EditorView;
     state: EditorState;
@@ -52,11 +52,12 @@ export class FormattingToolbarView {
     pmView.dom.addEventListener("focus", this.focusHandler);
     pmView.dom.addEventListener("blur", this.blurHandler);
 
-    // document.addEventListener("scroll", this.scrollHandler);
-    findScrollContainer(pmView.dom).addEventListener(
-      "scroll",
-      this.scrollHandler
-    );
+    this.timer = setTimeout(() => {
+      findScrollContainer(pmView.dom).addEventListener(
+        "scroll",
+        this.scrollHandler
+      );
+    })
   }
 
   viewMousedownHandler = () => {
@@ -110,7 +111,8 @@ export class FormattingToolbarView {
   };
 
   scrollHandler = () => {
-    if (this.state?.show) {
+    // this.state?.show
+    if (this.state) {
       this.state.referencePos = this.getSelectionBoundingBox();
       this.emitUpdate();
     }
@@ -181,7 +183,7 @@ export class FormattingToolbarView {
 
     this.pmView.dom.removeEventListener("focus", this.focusHandler);
     this.pmView.dom.removeEventListener("blur", this.blurHandler);
-
+    clearTimeout(this.timer);
     findScrollContainer(this.pmView.dom).removeEventListener("scroll", this.scrollHandler);
   }
 
@@ -197,7 +199,7 @@ export class FormattingToolbarView {
     if (isNodeSelection(selection)) {
       const node = this.pmView.nodeDOM(from) as HTMLElement;
 
-      if (node) {
+      if (node?.getBoundingClientRect) {
         return node.getBoundingClientRect();
       }
     }

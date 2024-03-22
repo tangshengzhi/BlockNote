@@ -597,6 +597,7 @@ export const BlockContainer = Node.create<{
 
     const handleEnter = () =>
       this.editor.commands.first(({ commands }) => [
+        () => commands.newlineInCode(),
         // Removes a level of nesting if the block is empty & indented, while the selection is also empty & at the start
         // of the block.
         () =>
@@ -628,7 +629,7 @@ export const BlockContainer = Node.create<{
         // empty & at the start of the block.
         () =>
           commands.command(({ state, chain }) => {
-            const { node, endPos } = getBlockInfoFromPos(
+            const { node, endPos, startPos } = getBlockInfoFromPos(
               state.doc,
               state.selection.from
             )!;
@@ -639,16 +640,26 @@ export const BlockContainer = Node.create<{
               state.selection.anchor === state.selection.head;
             const blockEmpty = node.textContent.length === 0;
 
-            if (selectionAtBlockStart && selectionEmpty && blockEmpty) {
-              const newBlockInsertionPos = endPos + 1;
-              const newBlockContentPos = newBlockInsertionPos + 2;
-
-              chain()
+            if (selectionAtBlockStart && selectionEmpty) {
+              if (blockEmpty) {
+                const newBlockInsertionPos = endPos + 1;
+                const newBlockContentPos = newBlockInsertionPos + 2;
+                chain()
                 .BNCreateBlock(newBlockInsertionPos)
                 .setTextSelection(newBlockContentPos)
                 .scrollIntoView()
                 .run();
+              } else {
+                const newBlockInsertionPos = startPos - 1;
+                const newBlockContentPos = newBlockInsertionPos + 2;
 
+                chain()
+                  .BNCreateBlock(newBlockInsertionPos)
+                  .setTextSelection(newBlockContentPos)
+                  .scrollIntoView()
+                  .run();
+
+              }
               return true;
             }
 
@@ -663,17 +674,29 @@ export const BlockContainer = Node.create<{
               state.selection.from
             )!;
 
-            const selectionAtBlockStart =
-              state.selection.$anchor.parentOffset === 0;
-            const blockEmpty = node.textContent.length === 0;
+            // const selectionAtBlockStart =
+            //   state.selection.$anchor.parentOffset === 0;
+
+            let blockEmpty = node.textContent.length === 0;
+
+            if (
+              node.type.name === "blockContainer" &&
+              node.firstChild?.type.name === "paragraph"
+            ) {
+              node.firstChild.forEach((child) => {
+                if (child.type.name === "inlineIssue") {
+                  blockEmpty = false;
+                }
+              });
+            }
 
             if (!blockEmpty) {
-              chain()
+              const result = chain()
                 .deleteSelection()
-                .BNSplitBlock(state.selection.from, selectionAtBlockStart)
+                .BNSplitBlock(state.selection.from, false)
                 .run();
 
-              return true;
+              return result;
             }
 
             return false;
@@ -687,13 +710,82 @@ export const BlockContainer = Node.create<{
       // Always returning true for tab key presses ensures they're not captured by the browser. Otherwise, they blur the
       // editor since the browser will try to use tab for keyboard navigation.
       Tab: () => {
+        if (this.editor.isActive("codeBlock")) {
+          this.editor.commands.insertContent("\t");
+          return true;
+        }
+
+        const state = this.editor.state;
+        const { contentType } = getBlockInfoFromPos(
+          state.doc,
+          state.selection.from
+        )!;
+
+        const isParagraph = contentType.name === "paragraph";
+        const isCodeblock = contentType.name === "codeBlock";
+        const isQuote = contentType.name === "blockquote";
+        const isHeading = contentType.name === "heading";
+
+        if (isParagraph || isCodeblock || isQuote || isHeading) {
+          this.editor.commands.insertContent("\t");
+          return true;
+        }
+        
         this.editor.commands.sinkListItem("blockContainer");
         return true;
       },
       "Shift-Tab": () => {
+        const state = this.editor.state;
+        const { contentType } = getBlockInfoFromPos(
+          state.doc,
+          state.selection.from
+        )!;
+
+        const isParagraph = contentType.name === "paragraph";
+
+        if (isParagraph) {
+          this.editor.commands.insertContent("\t");
+          return true;
+        }
+
         this.editor.commands.liftListItem("blockContainer");
         return true;
       },
+      // "Mod-Alt-0": () =>
+      //   this.editor.commands.BNCreateBlock(
+      //     this.editor.state.selection.anchor + 2
+      //   ),
+      // "Mod-Alt-1": () =>
+      //   this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
+      //     type: "heading",
+      //     props: {
+      //       level: "1",
+      //     },
+      //   }),
+      // "Mod-Alt-2": () =>
+      //   this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
+      //     type: "heading",
+      //     props: {
+      //       level: "2",
+      //     },
+      //   }),
+      // "Mod-Alt-3": () =>
+      //   this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
+      //     type: "heading",
+      //     props: {
+      //       level: "3",
+      //     },
+      //   }),
+      // "Mod-Alt-9": () =>
+      //   this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
+      //     type: "bulletListItem",
+      //     props: {},
+      //   }),
+      // "Mod-Alt-7": () =>
+      //   this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
+      //     type: "numberedListItem",
+      //     props: {},
+      //   }),
     };
   },
 });

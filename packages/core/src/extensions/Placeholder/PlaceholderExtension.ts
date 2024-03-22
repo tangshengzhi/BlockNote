@@ -79,7 +79,7 @@ export const Placeholder = Extension.create<PlaceholderOptions>({
               styleSheet.insertRule(
                 `${getSelector(blockType, true)}{ content: ${JSON.stringify(
                   placeholder
-                )}; }`
+                )}; color:#cfcfcf; }`
               );
             }
           }
