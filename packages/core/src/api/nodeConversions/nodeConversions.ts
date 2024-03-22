@@ -157,6 +157,35 @@ export function inlineContentToNodes<
       );
     }
   }
+  // for (const content of blockContent) {
+  //   if (content.type === "link") {
+  //     nodes.push(...linkToNodes(content, schema));
+  //   } else if (content.type === "text") {
+  //     nodes.push(...styledTextArrayToNodes([content], schema));
+  //   } else if (schema.nodes[(content as any).type]) {
+  //     const children: Node[] = [];
+  //     const ctx = content as any;
+  //     if (ctx.content) {
+  //       if (typeof ctx.content === "string") {
+  //         children.push(schema.text(ctx.content));
+  //       } else {
+  //         children.push(...inlineContentToNodes(ctx.content, schema));
+  //       }
+  //     } else if (ctx.text) {
+  //       children.push(schema.text(ctx.text));
+  //     }
+
+  //     nodes.push(
+  //       schema.nodes[ctx.type].create(
+  //         ctx.attrs,
+  //         children.length ? children : undefined
+  //       )
+  //     );
+  //   } else {
+  //     throw new UnreachableCaseError(content);
+  //   }
+  // }
+
   return nodes;
 }
 
@@ -313,6 +342,26 @@ export function contentNodeToInlineContent<
 >(contentNode: Node, inlineContentSchema: I, styleSchema: S) {
   const content: InlineContent<any, S>[] = [];
   let currentContent: InlineContent<any, S> | undefined = undefined;
+
+  if (contentNode.type.name === "taskList") {
+    contentNode.content.forEach((node: any) => {
+      if (node.type.name === "taskItem") {
+        const innerContent: InlineContent[] = [];
+
+        // contentNodeToInlineContent
+        node.content.forEach((node: any) => {
+          innerContent.push(...contentNodeToInlineContent(node,  inlineContentSchema,styleSchema));
+        });
+        content.push({
+          type: "taskItem",
+          content: innerContent,
+          attrs: node.attrs,
+        } as any);
+      }
+    });
+    return content;
+  }
+
 
   // Most of the logic below is for handling links because in ProseMirror links are marks
   // while in BlockNote links are a type of inline content

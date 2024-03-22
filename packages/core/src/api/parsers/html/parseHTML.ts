@@ -18,6 +18,12 @@ export async function HTMLToBlocks<
   const htmlNode = nestedListsToBlockNoteStructure(html);
   const parser = DOMParser.fromSchema(pmSchema);
 
+  htmlNode.querySelectorAll("ol").forEach((ol) =>
+    ol.querySelectorAll("&>li").forEach((li, index) => {
+      (li as HTMLLIElement).dataset["index"] = `${index + 1}`;
+    })
+  );
+
   // Other approach might be to use
   // const doc = pmSchema.nodes["doc"].createAndFill()!;
   // and context: doc.resolve(3),

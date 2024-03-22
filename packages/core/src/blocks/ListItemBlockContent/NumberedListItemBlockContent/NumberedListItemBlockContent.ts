@@ -12,8 +12,64 @@ import { getCurrentBlockContentType } from "../../../api/getCurrentBlockContentT
 
 export const numberedListItemPropSchema = {
   ...defaultProps,
+  index: {
+    default: "1",
+    values: Array(100).map((_, i) => `${i + 1}`) as string[],
+  },
+  level: {
+    default: "1",
+    values: Array(100).map((_, i) => `${i + 1}`) as string[],
+  },
 } satisfies PropSchema;
 
+function generateIndexChar(index: number, level: number) {
+  if (level % 3 === 1) {
+    return index.toString();
+  } else if (level % 3 === 2) {
+    const base = "a".charCodeAt(0) - 1; // 'a' 的 ASCII 值减 1
+    let suffix = "";
+    while (index > 0) {
+      let remainder = index % 26;
+      if (remainder === 0) {
+        remainder = 26;
+      }
+      suffix = String.fromCharCode(base + remainder) + suffix;
+      index = Math.floor((index - remainder) / 26);
+    }
+    return suffix;
+  } else if (level % 3 === 0) {
+    return convertToRoman(index);
+  } else {
+    return index.toString();
+  }
+}
+
+function convertToRoman(num: number) {
+  const romanNumerals = [
+    { value: 1000, symbol: "M" },
+    { value: 900, symbol: "CM" },
+    { value: 500, symbol: "D" },
+    { value: 400, symbol: "CD" },
+    { value: 100, symbol: "C" },
+    { value: 90, symbol: "XC" },
+    { value: 50, symbol: "L" },
+    { value: 40, symbol: "XL" },
+    { value: 10, symbol: "X" },
+    { value: 9, symbol: "IX" },
+    { value: 5, symbol: "V" },
+    { value: 4, symbol: "IV" },
+    { value: 1, symbol: "I" },
+  ];
+
+  let result = "";
+  for (let i = 0; i < romanNumerals.length; i++) {
+    while (num >= romanNumerals[i].value) {
+      result += romanNumerals[i].symbol;
+      num -= romanNumerals[i].value;
+    }
+  }
+  return result;
+}
 const NumberedListItemBlockContent = createStronglyTypedTiptapNode({
   name: "numberedListItem",
   content: "inline*",
@@ -26,6 +82,15 @@ const NumberedListItemBlockContent = createStronglyTypedTiptapNode({
         renderHTML: (attributes) => {
           return {
             "data-index": attributes.index,
+          };
+        },
+      },
+      level: {
+        default: "1",
+        parseHTML: (element) => element.getAttribute("data-level"),
+        renderHTML: (attributes) => {
+          return {
+            "data-level": attributes.level,
           };
         },
       },
@@ -135,7 +200,10 @@ const NumberedListItemBlockContent = createStronglyTypedTiptapNode({
     ];
   },
 
-  renderHTML({ HTMLAttributes }) {
+  renderHTML({ HTMLAttributes, node }) {
+    const index = Number.parseInt(node.attrs.index || "1");
+    const level = Number.parseInt(node.attrs.level || "1");
+
     return createDefaultBlockDOMOutputSpec(
       this.name,
       // We use a <p> tag, because for <li> tags we'd need an <ol> element to
@@ -145,6 +213,8 @@ const NumberedListItemBlockContent = createStronglyTypedTiptapNode({
       {
         ...(this.options.domAttributes?.blockContent || {}),
         ...HTMLAttributes,
+        "data-content-type": this.name,
+        "data-num-char": generateIndexChar(index, level),
       },
       this.options.domAttributes?.inlineContent || {}
     );

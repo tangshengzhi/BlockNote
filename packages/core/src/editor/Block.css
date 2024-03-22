@@ -165,7 +165,7 @@ NESTED BLOCKS
 }
 
 [data-content-type="numberedListItem"] {
-  --index: attr(data-index);
+  --index: attr(data-num-char);
 }
 
 [data-prev-type="numberedListItem"] {

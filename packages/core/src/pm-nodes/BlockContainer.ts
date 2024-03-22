@@ -492,7 +492,7 @@ export const BlockContainer = Node.create<{
         // Reverts block content type to a paragraph if the selection is at the start of the block.
         () =>
           commands.command(({ state }) => {
-            const { contentType, startPos } = getBlockInfoFromPos(
+            const { contentType, startPos, contentNode } = getBlockInfoFromPos(
               state.doc,
               state.selection.from
             )!;
@@ -500,7 +500,7 @@ export const BlockContainer = Node.create<{
             const selectionAtBlockStart = state.selection.from === startPos + 1;
             const isParagraph = contentType.name === "paragraph";
 
-            if (selectionAtBlockStart && !isParagraph) {
+            if (selectionAtBlockStart && !isParagraph && contentNode.childCount === 0) {
               return commands.BNUpdateBlock(state.selection.from, {
                 type: "paragraph",
                 props: {},
