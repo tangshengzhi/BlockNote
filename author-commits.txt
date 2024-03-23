@@ -10,9 +10,11 @@ c463faadd9456959349cf190b37de23fb92843d4 Fix：上下键
 f62300e09b0cf3e3cee04323bc61e213cec043b3 keyboardHoveredItemIndex不更新问题bugfix
 3e4fd5a9aa48ad25ecd6aec07fd8d23aaea57801 v0.138
 b0217fd5f47952a4144550a0a48181c23cb71514 lint fix
+
 e7971dc87f9e9cd4e1c19fba3e15e8659f66e3c3 [ZK-65162] 【文档】协作无法同时上传视频或输入文本
 c757d03378ac59454301596deccf653a302386be [ZK-65144] 【文档】菜单打开的时候，其他协作者输入的内容没有在文档中实时显示出来
 7cd2a6be9fb0e83623b7e04a5e46266f73c54759 [ZK-65162] 【文档】协作无法同时上传视频或输入文本
+
 5b5347ea0589b647a9392eb4ac417a17d360ecdb update
 a4fca8338fa16d234447fa8e82b7b6cf428dcfc2 update
 fa7bfb8b9da1eed2fdb1a50052fa04f4756419a2 update
@@ -22,8 +24,10 @@ b936342df8eaa3b06ab989e21ef4f9084caaa263 update
 c6a944bb393ce07eb04b0230304b985ca2d128fe update
 f9992cec74e946eb54a69e48408b95745ca45cef update
 1cbc06e11085cd5e146afba9bc52a1c803df8dd7 update
+
 38e422ffbff6c7bbde3ca770f7bc380a1f1c410d update
 7ff44d66be64a36715be6d0890141caf43d0c0a7 update
+
 295bd39baee81210046b9efe75e0bae89387713c 样式问题
 0b671061dfb47df4bb18a1a62a81b063a37b4781 update
 b1188f2fa6cad4bf301ee4df55759d3550a14e38 update
@@ -32,8 +36,8 @@ e7d856ad523a965b28a796a045f05947c8f6db74 导出功能函数
 5d4fb288effb566a75c812d20a170f14ad048f0d feat: 序号问题
 911f105c6489d62a173c754de57b430a05ef5894 fix表格交互
 e2b82754d5c539154b75aded1ed2d96bae85125c 斜杠菜单屏蔽表格
-51c005d8514e620c9dda464afe70a6bab4b7c88d Update version and fix numbering for numbered list items
 
+51c005d8514e620c9dda464afe70a6bab4b7c88d Update version and fix numbering for numbered list items
 38d6f40083f8990c400bed91211f16e3df4aac2d update
 0aec7bc9e99818e38f0a5743fefdba6acc9d4f0f update
 1a9b151b827da6535a3e3e7b5333bb1462d5c5aa update

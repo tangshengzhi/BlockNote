@@ -11,6 +11,10 @@ import { getCurrentBlockContentType } from "../../../api/getCurrentBlockContentT
 
 export const bulletListItemPropSchema = {
   ...defaultProps,
+  level: {
+    default: "1",
+    values: Array(100).map((_, i) => `${i + 1}`) as string[],
+  },
 } satisfies PropSchema;
 
 const BulletListItemBlockContent = createStronglyTypedTiptapNode({
@@ -37,6 +41,19 @@ const BulletListItemBlockContent = createStronglyTypedTiptapNode({
         },
       }),
     ];
+  },
+  addAttributes() {
+    return {
+      level: {
+        default: "1",
+        parseHTML: (element) => element.getAttribute("data-level"),
+        renderHTML: (attributes) => {
+          return {
+            "data-level": attributes.level,
+          };
+        },
+      },
+    };
   },
 
   addKeyboardShortcuts() {

@@ -475,7 +475,7 @@ export class SideMenuView<
     }
 
     // Shows or updates elements.
-    if (this.editor.isEditable && this.hoveredBlock) {
+    if (this.editor.isEditable && this.hoveredBlock && this.hoveredBlock.getAttribute("data-id")) {
       const blockContentBoundingBox = blockContent.getBoundingClientRect();
 
       this.state = {
@@ -498,7 +498,7 @@ export class SideMenuView<
   };
 
   onScroll = () => {
-    if (this.state?.show) {
+    if (this.state?.show && this.hoveredBlock) {
       const blockContent = this.hoveredBlock!.firstChild as HTMLElement;
       const blockContentBoundingBox = blockContent.getBoundingClientRect();
 

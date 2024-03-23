@@ -8,6 +8,7 @@ import { UiElementPosition } from "../../extensions-shared/UiElementPosition";
 import { EventEmitter } from "../../util/EventEmitter";
 import { findScrollContainer } from "../../util/browser";
 import { isActive } from "@tiptap/core";
+import { getBlockInfoFromPos } from "../../../api/getBlockInfoFromPos";
 
 const findBlock = findParentNode((node) => node.type.name === "blockContainer");
 
@@ -85,12 +86,14 @@ class SuggestionMenuView<
     );
 
     if (this.editor.isEditable) {
-      this.state = {
-        show: true,
-        referencePos: decorationNode!.getBoundingClientRect(),
-        query: this.pluginState!.query,
-      };
-
+      if (decorationNode) {
+        this.state = {
+          show: true,
+          referencePos: decorationNode!.getBoundingClientRect(),
+          query: this.pluginState!.query,
+        };
+      }
+      
       this.emitUpdate(this.pluginState!.triggerCharacter!);
     }
   }
@@ -113,13 +116,16 @@ class SuggestionMenuView<
     if (this.pluginState === undefined) {
       return;
     }
+    const blockInfo = getBlockInfoFromPos(this.editor._tiptapEditor.state.doc, this.editor._tiptapEditor.state.selection.from);
+    const realQueryStartPos = this.pluginState.queryStartPos! + blockInfo.startPos
 
     this.editor._tiptapEditor
       .chain()
       .focus()
       .deleteRange({
         from:
-          this.pluginState.queryStartPos! -
+          // this.pluginState.queryStartPos! -
+          realQueryStartPos -
           (this.pluginState.fromUserInput
             ? this.pluginState.triggerCharacter!.length
             : 0),
@@ -196,7 +202,7 @@ export class SuggestionMenuProseMirrorPlugin<
             triggerCharacter: string;
             fromUserInput?: boolean;
           } | null = transaction.getMeta(suggestionMenuPluginKey);
-
+          const blockInfo = getBlockInfoFromPos(editor._tiptapEditor.state.doc, newState.selection.from);
           // Only opens a menu of no menu is already open
           if (
             typeof suggestionPluginTransactionMeta === "object" &&
@@ -208,7 +214,8 @@ export class SuggestionMenuProseMirrorPlugin<
                 suggestionPluginTransactionMeta.triggerCharacter,
               fromUserInput:
                 suggestionPluginTransactionMeta.fromUserInput !== false,
-              queryStartPos: newState.selection.from,
+              // queryStartPos: newState.selection.from,
+              queryStartPos: newState.selection.from - blockInfo.startPos,
               query: "",
               decorationId: `id_${Math.floor(Math.random() * 0xffffffff)}`,
             };
@@ -218,7 +225,7 @@ export class SuggestionMenuProseMirrorPlugin<
           if (prev === undefined) {
             return prev;
           }
-
+          const realQueryStartPos = blockInfo.startPos + prev.queryStartPos!
           // Checks if the menu should be hidden.
           if (
             // Highlighting text should hide the menu.
@@ -232,7 +239,7 @@ export class SuggestionMenuProseMirrorPlugin<
             transaction.getMeta("pointer") ||
             // Moving the caret before the character which triggered the menu should hide it.
             (prev.triggerCharacter !== undefined &&
-              newState.selection.from < prev.queryStartPos!)
+              newState.selection.from < realQueryStartPos)
           ) {
             return undefined;
           }
@@ -241,10 +248,24 @@ export class SuggestionMenuProseMirrorPlugin<
 
           // Updates the current query.
           next.query = newState.doc.textBetween(
-            prev.queryStartPos!,
+            // prev.queryStartPos!,
+            realQueryStartPos,
             newState.selection.from
           );
 
+          // const newBlock = getBlockInfoFromPos(editor._tiptapEditor.state.doc, newState.selection.from);
+          // const realTextList = new Array(blockInfo.endPos - blockInfo.startPos).fill(null).map((_, index) => {
+          //   return newState.doc.textBetween(
+          //     blockInfo.startPos + index,
+          //     blockInfo.startPos + index + 1
+          //   )
+          // }).filter(i => i)
+          // if (blockInfo.id === newBlock.id && realTextList.length === (blockInfo.endPos - blockInfo.startPos - 2)) {
+          //   // prev.query = [...prev.query] // 强制触发update, 更新位置
+          //   prev.query = prev.query
+          //   // next.notFoundCount = prev.notFoundCount;
+          //   // return prev;
+          // }
           return next;
         },
       },
@@ -261,7 +282,8 @@ export class SuggestionMenuProseMirrorPlugin<
           ) {
             if (
               isActive(view.state, "codeBlock") ||
-              isActive(view.state, "code")
+              isActive(view.state, "code") || 
+              isActive(view.state, "Table")
             ) {
               return false;
             }
@@ -269,7 +291,7 @@ export class SuggestionMenuProseMirrorPlugin<
             view.dispatch(
               view.state.tr
                 .insertText(event.key)
-                .scrollIntoView()
+                // .scrollIntoView()
                 .setMeta(suggestionMenuPluginKey, {
                   triggerCharacter: event.key,
                 })
@@ -309,12 +331,17 @@ export class SuggestionMenuProseMirrorPlugin<
               ]);
             }
           }
+          const blockInfo = getBlockInfoFromPos(editor._tiptapEditor.state.doc, editor._tiptapEditor.state.selection.from);
+          const realQueryStartPos: number = suggestionPluginState.queryStartPos! + blockInfo.startPos
+
           // Creates an inline decoration around the trigger character.
           return DecorationSet.create(state.doc, [
             Decoration.inline(
-              suggestionPluginState.queryStartPos! -
-                suggestionPluginState.triggerCharacter!.length,
-              suggestionPluginState.queryStartPos!,
+              // suggestionPluginState.queryStartPos! -
+              //   suggestionPluginState.triggerCharacter!.length,
+              // suggestionPluginState.queryStartPos!,
+              realQueryStartPos - suggestionPluginState.triggerCharacter!.length,
+              realQueryStartPos,
               {
                 nodeName: "span",
                 class: "bn-suggestion-decorator",

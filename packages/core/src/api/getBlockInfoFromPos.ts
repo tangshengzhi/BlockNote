@@ -14,6 +14,31 @@ export type BlockInfo = BlockInfoWithoutPositions & {
   depth: number;
 };
 
+function getSuitablePos(doc: Node, pos: number) {
+  const outerBlockGroupStartPos = 1;
+  const outerBlockGroupEndPos = doc.nodeSize - 2;
+  if (pos <= outerBlockGroupStartPos) {
+    pos = outerBlockGroupStartPos + 1;
+
+    while (
+      doc.resolve(pos).parent.type.name !== "blockContainer" &&
+      pos < outerBlockGroupEndPos
+    ) {
+      pos++;
+    }
+  } else if (pos >= outerBlockGroupEndPos) {
+    pos = outerBlockGroupEndPos - 1;
+
+    while (
+      doc.resolve(pos).parent.type.name !== "blockContainer" &&
+      pos > outerBlockGroupStartPos
+    ) {
+      pos--;
+    }
+  }
+  return pos
+}
+
 /**
  * Helper function for `getBlockInfoFromPos`, returns information regarding
  * provided blockContainer node.
@@ -46,33 +71,14 @@ export function getBlockInfoFromPos(doc: Node, pos: number): BlockInfo {
   // If the position is outside the outer block group, we need to move it to the
   // nearest block. This happens when the collaboration plugin is active, where
   // the selection is placed at the very end of the doc.
-  const outerBlockGroupStartPos = 1;
-  const outerBlockGroupEndPos = doc.nodeSize - 2;
-  if (pos <= outerBlockGroupStartPos) {
-    pos = outerBlockGroupStartPos + 1;
 
-    while (
-      doc.resolve(pos).parent.type.name !== "blockContainer" &&
-      pos < outerBlockGroupEndPos
-    ) {
-      pos++;
-    }
-  } else if (pos >= outerBlockGroupEndPos) {
-    pos = outerBlockGroupEndPos - 1;
-
-    while (
-      doc.resolve(pos).parent.type.name !== "blockContainer" &&
-      pos > outerBlockGroupStartPos
-    ) {
-      pos--;
-    }
-  }
-
-  // This gets triggered when a node selection on a block is active, i.e. when
+  pos = getSuitablePos(doc, pos);
+ // This gets triggered when a node selection on a block is active, i.e. when
   // you drag and drop a block.
   if (doc.resolve(pos).parent.type.name === "blockGroup") {
     pos++;
   }
+  pos = getSuitablePos(doc, pos);
 
   const $pos = doc.resolve(pos);
 
