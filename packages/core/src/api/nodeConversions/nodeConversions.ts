@@ -323,7 +323,7 @@ function contentNodeToTableContent<
           cellNode.firstChild!,
           inlineContentSchema,
           styleSchema
-        )
+        ) as any
       );
     });
 
