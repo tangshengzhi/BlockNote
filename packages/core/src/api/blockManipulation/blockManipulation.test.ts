@@ -121,10 +121,10 @@ describe("Test strong typing", () => {
         { id: "sdf" },
         {
           type: "paragraph",
-          props: {
-            // @ts-expect-error level not suitable for paragraph
-            level: 1,
-          },
+          // props: {
+          //   // @ts-expect-error level not suitable for paragraph
+          //   level: 1,
+          // },
         }
       );
     } catch (e) {

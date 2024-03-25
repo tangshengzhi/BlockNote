@@ -18,7 +18,7 @@ export class FormattingToolbarView {
   public preventShow = false;
   public prevWasEditable: boolean | null = null;
   private timer: any
-  private scrollableContainer: HTMLElement | Document
+  private scrollableContainer: HTMLElement | Document | null = null;
   public shouldShow: (props: {
     view: EditorView;
     state: EditorState;
@@ -55,7 +55,7 @@ export class FormattingToolbarView {
 
     this.timer = setTimeout(() => {
       this.scrollableContainer = findScrollContainer(pmView.dom) || pmView.dom;
-      this.scrollableContainer.addEventListener(
+      this.scrollableContainer?.addEventListener(
         "scroll",
         this.scrollHandler
       );
@@ -186,7 +186,7 @@ export class FormattingToolbarView {
     this.pmView.dom.removeEventListener("focus", this.focusHandler);
     this.pmView.dom.removeEventListener("blur", this.blurHandler);
     clearTimeout(this.timer);
-    this.scrollableContainer.removeEventListener("scroll", this.scrollHandler);
+    this.scrollableContainer?.removeEventListener("scroll", this.scrollHandler);
   }
 
   getSelectionBoundingBox() {

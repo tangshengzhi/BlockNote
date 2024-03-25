@@ -346,7 +346,7 @@ export function contentNodeToInlineContent<
   if (contentNode.type.name === "taskList") {
     contentNode.content.forEach((node: any) => {
       if (node.type.name === "taskItem") {
-        const innerContent: InlineContent[] = [];
+        const innerContent: InlineContent<any, S>[] = [];
 
         // contentNodeToInlineContent
         node.content.forEach((node: any) => {

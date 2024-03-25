@@ -8,7 +8,7 @@ import { UiElementPosition } from "../../extensions-shared/UiElementPosition";
 import { EventEmitter } from "../../util/EventEmitter";
 import { findScrollContainer } from "../../util/browser";
 import { isActive } from "@tiptap/core";
-import { getBlockInfoFromPos } from "../../../api/getBlockInfoFromPos";
+import { getBlockInfoFromPos } from "../../api/getBlockInfoFromPos";
 
 const findBlock = findParentNode((node) => node.type.name === "blockContainer");
 

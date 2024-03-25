@@ -572,7 +572,7 @@ export const BlockContainer = Node.create<{
         () => commands.deleteSelection(),
         () =>
         commands.command(({ state }) => {
-          const { contentType, contentNode } = getBlockInfoFromPos(
+          const { contentNode } = getBlockInfoFromPos(
             state.doc,
             state.selection.from
           )!;
