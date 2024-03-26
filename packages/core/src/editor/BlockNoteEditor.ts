@@ -328,9 +328,6 @@ export class BlockNoteEditor<
     ) as BlockNoteTipTapEditor & {
       contentComponent: any;
     };
-    // this._tiptapEditor = this.createEditor(tiptapOptions) as TEditor & {
-    //   contentComponent: any;
-    // };
   }
 
   /**

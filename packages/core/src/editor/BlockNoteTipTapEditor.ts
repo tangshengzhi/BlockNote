@@ -39,7 +39,7 @@ export class BlockNoteTipTapEditor extends TiptapEditor {
     //   };
     // }
     // options.injectCSS = false
-    super({ ...options, content: undefined });
+    super({ ...options, content: options.content || undefined });
 
     // try {
     //   globalThis.window = w;
