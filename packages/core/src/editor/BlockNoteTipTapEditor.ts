@@ -1,6 +1,7 @@
 import { EditorOptions, createDocument } from "@tiptap/core";
 // import "./blocknote.css";
-import { Editor as TiptapEditor } from "@tiptap/core";
+// import { Editor as TiptapEditor } from "@tiptap/core";
+import { Editor as TiptapEditor } from '@tiptap/vue-3'
 import { Node } from "@tiptap/pm/model";
 import { EditorView } from "@tiptap/pm/view";
 import { EditorState } from "prosemirror-state";
@@ -114,11 +115,11 @@ export class BlockNoteTipTapEditor extends TiptapEditor {
     return this._state;
   }
 
-  createView() {
-    // no-op
-    // Disable default call to `createView` in the Editor constructor.
-    // We should call `createView` manually only when a DOM element is available
-  }
+  // createView() {
+  //   // no-op
+  //   // Disable default call to `createView` in the Editor constructor.
+  //   // We should call `createView` manually only when a DOM element is available
+  // }
 
   /**
    * Replace the default `createView` method with a custom one - which we call on mount

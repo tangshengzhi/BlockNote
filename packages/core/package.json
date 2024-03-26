@@ -3,7 +3,7 @@
   "homepage": "https://github.com/TypeCellOS/BlockNote",
   "private": false,
   "license": "MPL-2.0",
-  "version": "0.12.1-alpha.1",
+  "version": "0.12.1-alpha.3",
   "files": [
     "dist",
     "types",
@@ -56,6 +56,7 @@
   "dependencies": {
     "linkifyjs": "^4.1.1",
     "redom": "^3.29.1",
+    "@tiptap/vue-3": "2.1.12",
     "@tiptap/core": "^2.0.3",
     "@tiptap/extension-bold": "^2.0.3",
     "@tiptap/extension-code": "^2.0.3",
