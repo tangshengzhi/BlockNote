@@ -199,6 +199,7 @@ type PartialBlockFromConfigNoChildren<
 > = {
   id?: string;
   type?: B["type"];
+  attrs?: Partial<Props<B["propSchema"]>>;
   props?: Partial<Props<B["propSchema"]>>;
   content?: B["content"] extends "inline"
     ? PartialInlineContent<I, S>

@@ -15,6 +15,7 @@ import { getBlockInfoFromPos } from "../api/getBlockInfoFromPos";
 import {
   inlineContentToNodes,
   nodeToBlock,
+  blockToNode
 } from "../api/nodeConversions/nodeConversions";
 import { getNodeById } from "../api/nodeUtil";
 import { HTMLToBlocks } from "../api/parsers/html/parseHTML";
@@ -298,7 +299,7 @@ export class BlockNoteEditor<
           initialContent
       );
     }
-
+    const styleSchema = this.schema.styleSchema
     const tiptapOptions: BlockNoteTipTapEditorOptions = {
       ...blockNoteTipTapOptions,
       ...newOptions._tiptapOptions,
@@ -319,6 +320,24 @@ export class BlockNoteEditor<
           ),
         },
         transformPasted,
+      },
+      onBeforeCreate(editor) {
+        if (!initialContent) {
+          // when using collaboration
+          return;
+        }
+        // we have to set the initial content here, because now we can use the editor schema
+        // which has been created at this point
+        const schema = editor.editor.schema;
+        const ic = initialContent.map((block) => blockToNode(block, schema, styleSchema));
+
+        const root = schema.node(
+          "doc",
+          undefined,
+          schema.node("blockGroup", undefined, ic)
+        );
+        // override the initialcontent
+        editor.editor.options.content = root.toJSON();
       },
     };
 

@@ -144,6 +144,7 @@ export function inlineContentToNodes<
 ): Node[] {
   const nodes: Node[] = [];
 
+  // 这里的处理有点问题
   for (const content of blockContent) {
     if (typeof content === "string") {
       nodes.push(...styledTextArrayToNodes(content, schema, styleSchema));
@@ -189,6 +190,9 @@ export function inlineContentToNodes<
   return nodes;
 }
 
+function getFullBlockProps(block: any) {
+  return Object.assign({}, block.props, block.attrs || {})
+}
 /**
  * converts an array of inline content elements to prosemirror nodes
  */
@@ -244,18 +248,18 @@ function blockOrInlineContentToContentNode(
   }
 
   if (!block.content) {
-    contentNode = schema.nodes[type].create(block.props);
+    contentNode = schema.nodes[type].create(getFullBlockProps(block));
   } else if (typeof block.content === "string") {
     contentNode = schema.nodes[type].create(
-      block.props,
+      getFullBlockProps(block),
       schema.text(block.content)
     );
   } else if (Array.isArray(block.content)) {
     const nodes = inlineContentToNodes(block.content, schema, styleSchema);
-    contentNode = schema.nodes[type].create(block.props, nodes);
+    contentNode = schema.nodes[type].create(getFullBlockProps(block), nodes);
   } else if (block.content.type === "tableContent") {
     const nodes = tableContentToNodes(block.content, schema, styleSchema);
-    contentNode = schema.nodes[type].create(block.props, nodes);
+    contentNode = schema.nodes[type].create(getFullBlockProps(block), nodes);
   } else {
     throw new UnreachableCaseError(block.content.type);
   }
@@ -294,7 +298,7 @@ export function blockToNode(
   return schema.nodes["blockContainer"].create(
     {
       id: id,
-      ...block.props,
+      ...(getFullBlockProps(block)),
     },
     children.length > 0 ? [contentNode, groupNode] : contentNode
   );

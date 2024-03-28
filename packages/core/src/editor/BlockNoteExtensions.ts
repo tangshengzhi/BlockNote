@@ -57,7 +57,7 @@ export const getBlockNoteExtensions = <
   };
 }) => {
   const ret: Extensions = [
-    // extensions.ClipboardTextSerializer,
+    extensions.ClipboardTextSerializer,
     extensions.Commands,
     extensions.Editable,
     extensions.FocusEvents,
@@ -130,6 +130,13 @@ export const getBlockNoteExtensions = <
         }),
       ];
     }),
+    // ...(Object.values(opts.blockSchema).map((blockSpec) =>
+    //   (blockSpec as any).node?.configure({
+    //     editor: opts.editor,
+    //     domAttributes: opts.domAttributes,
+    //   })
+    // ).filter(i => i)),
+
     createCopyToClipboardExtension(opts.editor),
     createPasteFromClipboardExtension(opts.editor),
 
