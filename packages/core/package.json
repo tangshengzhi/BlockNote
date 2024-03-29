@@ -3,7 +3,7 @@
   "homepage": "https://github.com/TypeCellOS/BlockNote",
   "private": false,
   "license": "MPL-2.0",
-  "version": "0.9.2-alpha.145",
+  "version": "0.9.2",
   "files": [
     "dist",
     "types",
@@ -41,7 +41,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "build-bundled": "tsc && vite build --config vite.config.bundled.ts && git checkout tmp-releases && rm -rf ../../release && mv ../../release-tmp ../../release",
     "preview": "vite preview",
     "lint": "eslint src --max-warnings 0",
