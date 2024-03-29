@@ -145,7 +145,7 @@ function decryptLink(encryptedLink: string): string {
   return decryptedLink;
 }
 export function decryptLinks(text: string) {
-  const regex = /\{\{\{\$(\d+)-(.+?)\}\}\}/g;
+  const regex = /\{\{\{(\d+)-(.+?)\}\}\}/g;
   return text.replaceAll(regex, (match, citationNumber, encryptedLink) => {
     const decryptedLink = decryptLink(encryptedLink); // 解密链接
     return `{{{${citationNumber}-${decryptedLink}}}}`;
@@ -165,7 +165,7 @@ export async function markdownToBlocks<BSchema extends BlockSchema>(
   blockSchema: BSchema,
   schema: Schema
 ): Promise<Block<BSchema>[]> {
-  const htmlString = unified()
+  const htmlString = await unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkRehype, {
@@ -175,7 +175,7 @@ export async function markdownToBlocks<BSchema extends BlockSchema>(
       },
     })
     .use(rehypeStringify)
-    .processSync(markdown);
+    .process(markdown);
 
   return HTMLToBlocks(
     transformCitation(htmlString.value as string),
