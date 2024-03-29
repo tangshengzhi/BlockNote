@@ -136,7 +136,30 @@ function code(state: any, node: any) {
   state.patch(node, result);
   return result;
 }
+function decryptLink(encryptedLink: string): string {
+  const KEY = 42; // 解密密钥，必须与加密密钥相同
+  let decryptedLink = "";
+  for (let i = 0; i < encryptedLink.length; i++)
+    decryptedLink += String.fromCharCode(encryptedLink.charCodeAt(i) ^ KEY);
 
+  return decryptedLink;
+}
+export function decryptLinks(text: string) {
+  const regex = /\{\{\{(\d+)-(.+?)\}\}\}/g;
+  return text.replaceAll(regex, (match, citationNumber, encryptedLink) => {
+    const decryptedLink = decryptLink(encryptedLink); // 解密链接
+    return `{{{${citationNumber}-${decryptedLink}}}}`;
+  });
+}
+export function transformCitation(text: string) {
+  const decryptText = decryptLinks(text);
+  return decryptText?.replaceAll(
+    /\{\{\{(\d+)-(.+?)\}\}\}/g,
+    (match, citationNumber, encryptedLink) => {
+      return `<span data-type='inlineTips' data-tip-link='${encryptedLink}' data-tip-id='${citationNumber}'>${citationNumber}</span>`;
+    }
+  );
+}
 export async function markdownToBlocks<BSchema extends BlockSchema>(
   markdown: string,
   blockSchema: BSchema,
@@ -154,5 +177,9 @@ export async function markdownToBlocks<BSchema extends BlockSchema>(
     .use(rehypeStringify)
     .process(markdown);
 
-  return HTMLToBlocks(htmlString.value as string, blockSchema, schema);
+  return HTMLToBlocks(
+    transformCitation(htmlString.value as string),
+    blockSchema,
+    schema
+  );
 }
