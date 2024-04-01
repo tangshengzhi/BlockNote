@@ -191,7 +191,7 @@ export function inlineContentToNodes<
 }
 
 function getFullBlockProps(block: any) {
-  return Object.assign({}, block.props, block.attrs || {})
+  return Object.assign({}, block.attrs || {}, block.props)
 }
 /**
  * converts an array of inline content elements to prosemirror nodes
