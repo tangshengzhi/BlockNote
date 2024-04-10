@@ -22,7 +22,6 @@ export const TableExtension = Extension.create({
           this.editor.state.selection.$head.parent.type.name ===
             "tableParagraph"
         ) {
-          // @ts-expect-error
           this.editor.commands.setHardBreak();
 
           return true;

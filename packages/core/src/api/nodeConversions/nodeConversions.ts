@@ -752,7 +752,9 @@ export function nodeToBlock<
   }
 
   let content: Block<any, any, any>["content"];
-
+  if (blockConfig === undefined) {
+    throw new Error(`blockSchema中不存在${blockInfo.contentType.name}的类型定义`)
+  }
   if (blockConfig.content === "inline") {
     content = contentNodeToInlineContent(
       blockInfo.contentNode,

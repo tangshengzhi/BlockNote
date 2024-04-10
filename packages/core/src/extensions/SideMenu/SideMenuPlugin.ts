@@ -15,7 +15,7 @@ import { EventEmitter } from "../../util/EventEmitter";
 import { suggestionMenuPluginKey } from "../SuggestionMenu/SuggestionPlugin";
 import { MultipleNodeSelection } from "./MultipleNodeSelection";
 import { findScrollContainer } from "../../util/browser";
-
+import { getEditorWrapper } from '../../util/zkUtil';
 // let dragImageElement: Element | undefined;
 
 export type SideMenuState<
@@ -413,8 +413,7 @@ export class SideMenuView<
       event.clientY >= editorOuterBoundingBox.top &&
       event.clientY <= editorOuterBoundingBox.bottom;
 
-    const editorWrapper = this.pmView.dom.parentElement!;
-
+    const editorWrapper = getEditorWrapper(this.pmView.dom.parentElement)!;
     // Doesn't update if the mouse hovers an element that's over the editor but
     // isn't a part of it or the side menu.
     if (
