@@ -322,7 +322,7 @@ export class BlockNoteEditor<
         transformPasted,
       },
       onBeforeCreate(editor) {
-        if (!initialContent) {
+        if (options.collaboration) {
           // when using collaboration
           return;
         }
