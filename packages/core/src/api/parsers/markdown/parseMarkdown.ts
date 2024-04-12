@@ -57,7 +57,7 @@ function decryptLink(encryptedLink: string): string {
 }
 export function decryptLinks(text: string) {
   const regex = /\{\{\{(\d+)-(.+?)\}\}\}/g;
-  return text.replaceAll(regex, (match, citationNumber, encryptedLink) => {
+  return text.replaceAll(regex, (_, citationNumber, encryptedLink) => {
     const decryptedLink = decryptLink(encryptedLink); // 解密链接
     return `{{{${citationNumber}-${decryptedLink}}}}`;
   });
@@ -66,7 +66,7 @@ export function transformCitation(text: string) {
   const decryptText = decryptLinks(text);
   return decryptText?.replaceAll(
     /\{\{\{(\d+)-(.+?)\}\}\}/g,
-    (match, citationNumber, encryptedLink) => {
+    (_, citationNumber, encryptedLink) => {
       return `<span data-type='inlineTips' data-tip-link='${encryptedLink}' data-tip-id='${citationNumber}'>${citationNumber}</span>`;
     }
   );

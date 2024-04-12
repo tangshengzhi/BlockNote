@@ -39,19 +39,7 @@ export class BlockNoteTipTapEditor extends TiptapEditor {
     //   };
     // }
     // options.injectCSS = false
-    // const initContent = {
-    //   type: "doc",
-    //   content: [
-    //     {
-    //       type: "blockGroup",
-    //       // content: options?.content || []
-    //       content: (options?.content || []).map((b) =>
-    //         blockToNode(b, this.schema, styleSchema).toJSON()
-    //       ),
-    //     },
-    //   ],
-    // }
-    super({ ...options });
+    super({ ...options, content: undefined });
 
     // try {
     //   globalThis.window = w;
@@ -113,6 +101,8 @@ export class BlockNoteTipTapEditor extends TiptapEditor {
     // Create state immediately, so that it's available independently from the View,
     // the way Prosemirror "intends it to be". This also makes sure that we can access
     // the state before the view is created / mounted.
+    // 这里需要重置为null，因为在mount的时候会重新赋值
+    this.view = null as unknown as EditorView;
     this._state = EditorState.create({
       doc,
       schema: this.schema,
@@ -128,6 +118,10 @@ export class BlockNoteTipTapEditor extends TiptapEditor {
   }
 
   createView() {
+    // 这里模拟一下view的创建，主要是让tiptap-vue的Editor组件可以正常工作，实际会在mount的时候重新赋值
+    this.view = {
+      state: this.state,
+    } as EditorView;
     // no-op
     // Disable default call to `createView` in the Editor constructor.
     // We should call `createView` manually only when a DOM element is available
