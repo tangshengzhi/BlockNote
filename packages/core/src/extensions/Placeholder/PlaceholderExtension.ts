@@ -68,7 +68,7 @@ export const Placeholder = Extension.create<PlaceholderOptions>({
               `${getSelector(
                 blockType,
                 mustBeFocused
-              )}{ content: ${JSON.stringify(placeholder)}; color:#cfcfcf; }`
+              )}{ content: ${placeholder}; color:#cfcfcf; }`
             );
 
             // For some reason, the placeholders which show when the block is focused
