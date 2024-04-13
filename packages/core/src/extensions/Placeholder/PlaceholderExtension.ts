@@ -62,8 +62,8 @@ export const Placeholder = Extension.create<PlaceholderOptions>({
           };
 
           for (const [blockType, placeholder] of Object.entries(placeholders)) {
-            const mustBeFocused = blockType === "default";
-
+            // const mustBeFocused = blockType === "default";
+            const mustBeFocused = ['default', 'heading', 'bulletListItem', 'numberedListItem'].includes(blockType)
             styleSheet.insertRule(
               `${getSelector(
                 blockType,
