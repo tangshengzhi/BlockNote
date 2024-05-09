@@ -504,8 +504,8 @@ export const BlockContainer = Node.create<{
 
             const selectionAtBlockStart = state.selection.from === startPos + 1;
             const isParagraph = contentType.name === "paragraph";
-
-            if (selectionAtBlockStart && !isParagraph && contentNode.childCount === 0) {
+            // && contentNode.childCount === 0
+            if (selectionAtBlockStart && !isParagraph) {
               return commands.BNUpdateBlock(state.selection.from, {
                 type: "paragraph",
                 props: {},
@@ -570,27 +570,6 @@ export const BlockContainer = Node.create<{
       this.editor.commands.first(({ commands }) => [
         // Deletes the selection if it's not empty.
         () => commands.deleteSelection(),
-        () =>
-        commands.command(({ state }) => {
-          const { contentNode } = getBlockInfoFromPos(
-            state.doc,
-            state.selection.from
-          )!;
-
-          const selectionAtBlockStart =
-            state.selection.$anchor.parentOffset === 0;
-          // const isParagraph = contentType.name === "paragraph";
-
-          if (
-            selectionAtBlockStart &&
-            // !isParagraph &&
-            contentNode.childCount === 0
-          ) {
-            return commands.BNDeleteBlock(state.selection.from);
-          }
-          return false;
-        }),
-
         // Merges block with the next one (at the same nesting level or lower),
         // if one exists, the block has no children, and the selection is at the
         // end of the block.
@@ -605,12 +584,9 @@ export const BlockContainer = Node.create<{
               state.selection.from
             )!;
 
-            const blockAtDocEnd = false;
-            const selectionAtBlockEnd =
-              state.selection.$anchor.parentOffset ===
-              contentNode.firstChild!.nodeSize;
-            const selectionEmpty =
-              state.selection.anchor === state.selection.head;
+            const blockAtDocEnd = endPos === state.doc.nodeSize - 4;
+            const selectionAtBlockEnd = state.selection.from === endPos - 1;
+            const selectionEmpty = state.selection.empty;
             const hasChildBlocks = node.childCount === 2;
 
             if (
@@ -638,7 +614,6 @@ export const BlockContainer = Node.create<{
 
     const handleEnter = () =>
       this.editor.commands.first(({ commands }) => [
-        () => commands.newlineInCode(),
         // Removes a level of nesting if the block is empty & indented, while the selection is also empty & at the start
         // of the block.
         () =>
@@ -681,15 +656,19 @@ export const BlockContainer = Node.create<{
               state.selection.anchor === state.selection.head;
             const blockEmpty = node.textContent.length === 0;
 
-            if (selectionAtBlockStart && selectionEmpty) {
+            if (selectionAtBlockStart && selectionEmpty && blockEmpty) {
+              
               if (blockEmpty) {
                 const newBlockInsertionPos = endPos + 1;
                 const newBlockContentPos = newBlockInsertionPos + 2;
+
                 chain()
-                .BNCreateBlock(newBlockInsertionPos)
-                .setTextSelection(newBlockContentPos)
-                .scrollIntoView()
-                .run();
+                  .BNCreateBlock(newBlockInsertionPos)
+                  .setTextSelection(newBlockContentPos)
+                  .scrollIntoView()
+                  .run();
+
+                return true;
               } else {
                 const newBlockInsertionPos = startPos - 1;
                 const newBlockContentPos = newBlockInsertionPos + 2;
@@ -700,8 +679,8 @@ export const BlockContainer = Node.create<{
                   .scrollIntoView()
                   .run();
 
+                return true;
               }
-              return true;
             }
 
             return false;
@@ -715,8 +694,8 @@ export const BlockContainer = Node.create<{
               state.selection.from
             )!;
 
-            // const selectionAtBlockStart =
-            //   state.selection.$anchor.parentOffset === 0;
+            const selectionAtBlockStart =
+              state.selection.$anchor.parentOffset === 0;
 
             let blockEmpty = node.textContent.length === 0;
 
@@ -732,12 +711,12 @@ export const BlockContainer = Node.create<{
             }
 
             if (!blockEmpty) {
-              const result = chain()
+              chain()
                 .deleteSelection()
-                .BNSplitBlock(state.selection.from, false)
+                .BNSplitBlock(state.selection.from, selectionAtBlockStart)
                 .run();
 
-              return result;
+              return true;
             }
 
             return false;
@@ -756,6 +735,15 @@ export const BlockContainer = Node.create<{
           return true;
         }
 
+        if (
+          this.options.editor.formattingToolbar?.shown ||
+          this.options.editor.linkToolbar?.shown ||
+          this.options.editor.imagePanel?.shown
+        ) {
+          // don't handle tabs if a toolbar is shown, so we can tab into / out of it
+          return false;
+        }
+
         const state = this.editor.state;
         const { contentType } = getBlockInfoFromPos(
           state.doc,
@@ -771,11 +759,20 @@ export const BlockContainer = Node.create<{
           this.editor.commands.insertContent("\t");
           return true;
         }
-        
+       
         this.editor.commands.sinkListItem("blockContainer");
         return true;
       },
       "Shift-Tab": () => {
+        if (
+          this.options.editor.formattingToolbar?.shown ||
+          this.options.editor.linkToolbar?.shown ||
+          this.options.editor.imagePanel?.shown
+        ) {
+          // don't handle tabs if a toolbar is shown, so we can tab into / out of it
+          return false;
+        }
+
         const state = this.editor.state;
         const { contentType } = getBlockInfoFromPos(
           state.doc,
@@ -792,41 +789,6 @@ export const BlockContainer = Node.create<{
         this.editor.commands.liftListItem("blockContainer");
         return true;
       },
-      // "Mod-Alt-0": () =>
-      //   this.editor.commands.BNCreateBlock(
-      //     this.editor.state.selection.anchor + 2
-      //   ),
-      // "Mod-Alt-1": () =>
-      //   this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
-      //     type: "heading",
-      //     props: {
-      //       level: "1",
-      //     },
-      //   }),
-      // "Mod-Alt-2": () =>
-      //   this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
-      //     type: "heading",
-      //     props: {
-      //       level: "2",
-      //     },
-      //   }),
-      // "Mod-Alt-3": () =>
-      //   this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
-      //     type: "heading",
-      //     props: {
-      //       level: "3",
-      //     },
-      //   }),
-      // "Mod-Alt-9": () =>
-      //   this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
-      //     type: "bulletListItem",
-      //     props: {},
-      //   }),
-      // "Mod-Alt-7": () =>
-      //   this.editor.commands.BNUpdateBlock(this.editor.state.selection.anchor, {
-      //     type: "numberedListItem",
-      //     props: {},
-      //   }),
     };
   },
 });
