@@ -28,7 +28,6 @@ export const createPasteFromClipboardExtension = <
               paste(_view, event) {
                 event.preventDefault();
                 let format: (typeof acceptedMIMETypes)[number] | null = null;
-
                 for (const mimeType of acceptedMIMETypes) {
                   if (event.clipboardData!.types.includes(mimeType)) {
                     format = mimeType;
@@ -43,8 +42,15 @@ export const createPasteFromClipboardExtension = <
                       data.trim()
                     );
 
-                    data = htmlNode.innerHTML;
+                    data = htmlNode.innerHTML;                    
                   }
+                  if (format === "text/plain") {
+                    data = data.replace(/\n/g, '<br>');
+                    data = data.replace(/ /g, '&nbsp;');
+                    data = data.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+                  }
+                 
+                  // console.log('----data---', format, data, event.clipboardData?.getData(format), editor._tiptapEditor.view.pasteHTML)
                   editor._tiptapEditor.view.pasteHTML(data);
                 }
 
