@@ -497,7 +497,7 @@ export const BlockContainer = Node.create<{
               return false;
             }
 
-            const { contentType, startPos, contentNode } = getBlockInfoFromPos(
+            const { contentType, startPos } = getBlockInfoFromPos(
               state.doc,
               state.selection.from
             )!;
@@ -579,7 +579,7 @@ export const BlockContainer = Node.create<{
               return false;
             }
 
-            const { node, contentNode, depth, endPos } = getBlockInfoFromPos(
+            const { node, depth, endPos } = getBlockInfoFromPos(
               state.doc,
               state.selection.from
             )!;
@@ -735,14 +735,14 @@ export const BlockContainer = Node.create<{
           return true;
         }
 
-        if (
-          this.options.editor.formattingToolbar?.shown ||
-          this.options.editor.linkToolbar?.shown ||
-          this.options.editor.imagePanel?.shown
-        ) {
-          // don't handle tabs if a toolbar is shown, so we can tab into / out of it
-          return false;
-        }
+        // if (
+        //   this.options.editor.formattingToolbar?.shown ||
+        //   this.options.editor.linkToolbar?.shown ||
+        //   this.options.editor.imagePanel?.shown
+        // ) {
+        //   // don't handle tabs if a toolbar is shown, so we can tab into / out of it
+        //   return false;
+        // }
 
         const state = this.editor.state;
         const { contentType } = getBlockInfoFromPos(
@@ -764,14 +764,14 @@ export const BlockContainer = Node.create<{
         return true;
       },
       "Shift-Tab": () => {
-        if (
-          this.options.editor.formattingToolbar?.shown ||
-          this.options.editor.linkToolbar?.shown ||
-          this.options.editor.imagePanel?.shown
-        ) {
-          // don't handle tabs if a toolbar is shown, so we can tab into / out of it
-          return false;
-        }
+        // if (
+        //   this.options.editor.formattingToolbar?.shown ||
+        //   this.options.editor.linkToolbar?.shown ||
+        //   this.options.editor.imagePanel?.shown
+        // ) {
+        //   // don't handle tabs if a toolbar is shown, so we can tab into / out of it
+        //   return false;
+        // }
 
         const state = this.editor.state;
         const { contentType } = getBlockInfoFromPos(
