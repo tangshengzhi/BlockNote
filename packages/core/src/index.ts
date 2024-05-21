@@ -29,3 +29,4 @@ export { UnreachableCaseError } from "./util/typescript";
 export * from "./api/nodeUtil";
 export * from "./api/getBlockInfoFromPos";
 export * from "./api/exporters/markdown/markdownExporter"
+export * from "./api/exporters/copyExtension";

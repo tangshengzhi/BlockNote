@@ -34,14 +34,33 @@ function selectedFragmentToHTML<
     view.state.schema,
     editor
   );
-  const externalHTML =
+  let externalHTML =
     externalHTMLExporter.exportProseMirrorFragment(selectedFragment);
-
+  externalHTML = transformExternalHtml(externalHTML)
   const plainText = cleanHTMLToMarkdown(externalHTML);
 
   return { internalHTML, externalHTML, plainText };
 }
-
+export function transformExternalHtml(html: string) {
+  const oDiv = document.createElement("div");
+  oDiv.innerHTML = html;
+  oDiv.querySelectorAll('[data-type="inlineTips"]').forEach((outputDom: Element) => {
+    if (outputDom?.parentElement) {
+      const container = document.createElement("span");
+      const newChild = document.createElement("a");
+      const link = outputDom.getAttribute("data-tip-link") || "";
+      newChild.href = link;
+      newChild.innerHTML = link;
+      const textNode1 = document.createTextNode(" ");
+      const textNode2 = document.createTextNode(" ");
+      container.appendChild(textNode1);
+      container.appendChild(newChild);
+      container.appendChild(textNode2);
+      outputDom.parentElement.replaceChild(container, outputDom);
+    }
+  });
+  return oDiv.innerHTML;
+}
 export const createCopyToClipboardExtension = <
   BSchema extends BlockSchema,
   I extends InlineContentSchema,
