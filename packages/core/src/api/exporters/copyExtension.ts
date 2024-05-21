@@ -36,7 +36,7 @@ function selectedFragmentToHTML<
   );
   let externalHTML =
     externalHTMLExporter.exportProseMirrorFragment(selectedFragment);
-  externalHTML = transformExternalHtml(externalHTML)
+  externalHTML = transformExternalHtml(externalHTML).innerHTML
   const plainText = cleanHTMLToMarkdown(externalHTML);
 
   return { internalHTML, externalHTML, plainText };
@@ -59,7 +59,7 @@ export function transformExternalHtml(html: string) {
       outputDom.parentElement.replaceChild(container, outputDom);
     }
   });
-  return oDiv.innerHTML;
+  return oDiv;
 }
 export const createCopyToClipboardExtension = <
   BSchema extends BlockSchema,
