@@ -38,6 +38,9 @@ export const createPasteFromClipboardExtension = <
                 event.preventDefault();
                 let format: (typeof acceptedMIMETypes)[number] | null = null;
                 for (const mimeType of acceptedMIMETypes) {
+                  if (isInCodeBlock(_view.state) && mimeType !== 'text/plain')  {
+                    continue;
+                  }
                   if (event.clipboardData!.types.includes(mimeType)) {
                     format = mimeType;
                     break;
@@ -46,7 +49,8 @@ export const createPasteFromClipboardExtension = <
 
                 if (format !== null) {
                   let data = event.clipboardData!.getData(format);
-                  if (format === "text/html" && !isInCodeBlock(_view.state)) {
+                  
+                  if (format === "text/html") {
                     const htmlNode = nestedListsToBlockNoteStructure(
                       data.trim()
                     );
