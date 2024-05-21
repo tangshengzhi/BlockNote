@@ -1,15 +1,24 @@
 import { Extension } from "@tiptap/core";
 import { Plugin } from "prosemirror-state";
-
+import type { EditorState } from '@tiptap/pm/state'
 import type { BlockNoteEditor } from "../../editor/BlockNoteEditor";
 import { BlockSchema, InlineContentSchema, StyleSchema } from "../../schema";
 import { nestedListsToBlockNoteStructure } from "./html/util/nestedLists";
+import { isNodeActive } from '@tiptap/core'
 
 const acceptedMIMETypes = [
   "blocknote/html",
   "text/html",
   "text/plain",
 ] as const;
+function isInCodeBlock(state: EditorState): boolean {
+  try {
+    return isNodeActive(state, 'codeBlock')
+  } catch(err) {
+    return false;
+  }
+  
+}
 
 export const createPasteFromClipboardExtension = <
   BSchema extends BlockSchema,
@@ -37,7 +46,7 @@ export const createPasteFromClipboardExtension = <
 
                 if (format !== null) {
                   let data = event.clipboardData!.getData(format);
-                  if (format === "text/html") {
+                  if (format === "text/html" && !isInCodeBlock(_view.state)) {
                     const htmlNode = nestedListsToBlockNoteStructure(
                       data.trim()
                     );
@@ -49,7 +58,6 @@ export const createPasteFromClipboardExtension = <
                     data = data.replace(/ /g, '&nbsp;');
                     data = data.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
                   }
-                 
                   // console.log('----data---', format, data, event.clipboardData?.getData(format), editor._tiptapEditor.view.pasteHTML)
                   editor._tiptapEditor.view.pasteHTML(data);
                 }
