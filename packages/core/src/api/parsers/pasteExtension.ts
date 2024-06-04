@@ -20,6 +20,21 @@ function isInCodeBlock(state: EditorState): boolean {
   
 }
 
+interface keyMap{
+  [key: string]: string
+}
+function escapeHTML(html: string): string {
+  return html.replace(/[&<>"']/g, function(match: string) {
+    const escape: keyMap = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return escape[match];
+  });
+}
 export const createPasteFromClipboardExtension = <
   BSchema extends BlockSchema,
   I extends InlineContentSchema,
@@ -58,6 +73,7 @@ export const createPasteFromClipboardExtension = <
                     data = htmlNode.innerHTML;                    
                   }
                   if (format === "text/plain") {
+                    data = escapeHTML(data);
                     data = data.replace(/\n/g, '<br>');
                     data = data.replace(/ /g, '&nbsp;');
                     data = data.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
