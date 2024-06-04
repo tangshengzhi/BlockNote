@@ -1,4 +1,4 @@
-import { Element as HASTElement, Parent as HASTParent } from "hast";
+import { Element as HASTElement, ElementContent, Parent as HASTParent } from "hast";
 import { fromDom } from "hast-util-from-dom";
 
 type SimplifyBlocksOptions = {
@@ -48,12 +48,12 @@ export function simplifyBlocks(options: SimplifyBlocksOptions) {
           : null;
 
       const isListItemBlock = listItemBlockTypes.has(
-        blockContent.properties!["dataContentType"] as string
+        blockContent?.properties?.["dataContentType"] as string
       );
 
       const listItemBlockType = isListItemBlock
         ? options.orderedListItemBlockTypes.has(
-            blockContent.properties!["dataContentType"] as string
+            blockContent?.properties?.["dataContentType"] as string
           )
           ? "ol"
           : "ul"
@@ -111,7 +111,7 @@ export function simplifyBlocks(options: SimplifyBlocksOptions) {
         // Lifts all children out of the current block, as only list items should allow nesting.
         tree.children.splice(i + 1, 0, ...blockGroup.children);
         // Replaces the block with only the content inside it.
-        tree.children[i] = blockContent.children[0];
+        tree.children[i] = blockContent?.children?.[0];
 
         // Updates the current index and number of child elements.
         const numElementsAdded = blockGroup.children.length;
@@ -119,7 +119,9 @@ export function simplifyBlocks(options: SimplifyBlocksOptions) {
         numChildElements += numElementsAdded;
       } else {
         // Replaces the block with only the content inside it.
-        tree.children[i] = blockContent.children[0];
+        if (blockContainer.properties?.dataNodeType === 'blockContainer') {
+          tree.children[i] = blockContent?.children?.[0];
+        }
       }
     }
 
@@ -131,6 +133,22 @@ export function simplifyBlocks(options: SimplifyBlocksOptions) {
         activeList.children.length,
         activeList
       );
+    }
+    if ((tree.children?.[0] as any)?.tagName === 'tr') {
+      tree.children = [{
+        properties: {
+          className: ['bn-inline-content']
+        },
+        // position: {},
+        tagName: 'table',
+        type: 'element',
+        children: [{
+          tagName: 'tbody',
+          type: 'element',
+          properties: {},
+          children: tree.children as ElementContent[]
+        }]
+      }]
     }
   };
 
