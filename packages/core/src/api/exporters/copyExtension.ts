@@ -6,7 +6,8 @@ import type { BlockNoteEditor } from "../../editor/BlockNoteEditor";
 import { BlockSchema, InlineContentSchema, StyleSchema } from "../../schema";
 import { createExternalHTMLExporter } from "./html/externalHTMLExporter";
 import { createInternalHTMLSerializer } from "./html/internalHTMLSerializer";
-import { cleanHTMLToMarkdown } from "./markdown/markdownExporter";
+import { cleanHTMLToCopyText } from "./markdown/markdownExporter";
+// cleanHTMLToCopyText
 import { EditorView } from "prosemirror-view";
 
 function selectedFragmentToHTML<
@@ -37,8 +38,9 @@ function selectedFragmentToHTML<
   let externalHTML =
     externalHTMLExporter.exportProseMirrorFragment(selectedFragment);
   externalHTML = transformExternalHtml(externalHTML).innerHTML
-  const plainText = cleanHTMLToMarkdown(externalHTML);
-
+  const plainText = cleanHTMLToCopyText(externalHTML)
+  // const plainText = cleanHTMLToCopyText(externalHTML);
+  // console.log('-plainText---', cleanHTMLToCopyText(externalHTML), '----分割线--',cleanHTMLToMarkdown(externalHTML))
   return { internalHTML, externalHTML, plainText };
 }
 export function transformExternalHtml(html: string) {

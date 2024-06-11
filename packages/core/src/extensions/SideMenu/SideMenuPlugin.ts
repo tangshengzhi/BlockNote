@@ -5,7 +5,7 @@ import { EditorView } from "prosemirror-view";
 
 import { createExternalHTMLExporter } from "../../api/exporters/html/externalHTMLExporter";
 import { createInternalHTMLSerializer } from "../../api/exporters/html/internalHTMLSerializer";
-import { cleanHTMLToMarkdown } from "../../api/exporters/markdown/markdownExporter";
+import { cleanHTMLToCopyText } from "../../api/exporters/markdown/markdownExporter";
 import { getBlockInfoFromPos } from "../../api/getBlockInfoFromPos";
 import { Block } from "../../blocks/defaultBlocks";
 import type { BlockNoteEditor } from "../../editor/BlockNoteEditor";
@@ -235,7 +235,7 @@ function dragStart<
       selectedSlice.content
     );
 
-    const plainText = cleanHTMLToMarkdown(externalHTML);
+    const plainText = cleanHTMLToCopyText(externalHTML);
 
     e.dataTransfer.clearData();
     e.dataTransfer.setData("blocknote/html", internalHTML);
