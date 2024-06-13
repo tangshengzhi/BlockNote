@@ -36,7 +36,7 @@ export function cleanHTMLToCopyText(cleanHTMLString: string) {
           let cellNum = 0;
           let validCellChildren: any[] = [];
           node.children.forEach((tableRow: any) => {
-            tableRow.children = tableRow.children.forEach((tableCell: any) => {
+            tableRow.children.forEach((tableCell: any) => {
               const cellIsValid = !!tableCell.children.length
               if (cellIsValid) {
                 validCellChildren = tableCell.children
